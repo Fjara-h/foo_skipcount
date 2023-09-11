@@ -2,7 +2,7 @@
 
 Track skip statistics for foobar2000
 
-Only the x64 version for V2 has been confirmed to work at the moment, I am in the processing of making it function for x86 and I will be looking into trying to make one for 1.6 and verifying ARM.
+Runs on Foobar2000 32-bit, 64-bit and legacy Foobar2000 1.5 up.
 
 # Build notes
 
