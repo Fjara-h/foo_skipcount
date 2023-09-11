@@ -1,0 +1,12 @@
+
+foobar2000-SDK/
+foobar2000/
+src/.vs/
+src/packages/
+src/x64/
+src/Release/
+src/Release FB2K/
+src/Debug/
+src/Debug FB2K/
+component/foo_skipcount.dll
+component/x64/foo_skipcount.dll

@@ -1,0 +1,152 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PREFERENCES DIALOGEX 0, 0, 287, 111
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
+FONT 8, "Microsoft Sans Serif", 400, 0, 0x0
+BEGIN
+    CONTROL         "Increment on Next Song press",IDC_COUNT_NEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,18,119,8
+    CONTROL         "Increment on Random Song press",IDC_COUNT_RANDOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,29,122,8
+    CONTROL         "Increment on Previous Song press",IDC_COUNT_PREVIOUS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,39,124,9
+    LTEXT           "Count skip before:",IDC_STATIC,16,51,75,8
+    COMBOBOX        IDC_CONDITION,75,50,67,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Percent:",IDC_STATIC,30,72,31,8
+    EDITTEXT        IDC_PERCENT,62,70,29,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           " %",IDC_STATIC,91,72,11,10
+    LTEXT           "Duration:",IDC_STATIC,30,86,28,8
+    EDITTEXT        IDC_TIME,62,84,54,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           " sec",IDC_STATIC,116,86,18,10
+    CONTROL         "Allow increment from paused",IDC_COUNT_FROM_PAUSE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,158,18,113,9
+    CONTROL         "Allowed increment from stopped",IDC_COUNT_FROM_STOP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,158,29,113,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_PREFERENCES, DIALOG
+    BEGIN
+        LEFTMARGIN, 16
+        RIGHTMARGIN, 271
+        VERTGUIDE, 30
+        VERTGUIDE, 62
+        VERTGUIDE, 91
+        VERTGUIDE, 158
+        TOPMARGIN, 18
+        BOTTOMMARGIN, 97
+        HORZGUIDE, 27
+        HORZGUIDE, 29
+        HORZGUIDE, 37
+        HORZGUIDE, 39
+        HORZGUIDE, 48
+        HORZGUIDE, 50
+        HORZGUIDE, 51
+        HORZGUIDE, 70
+        HORZGUIDE, 72
+        HORZGUIDE, 82
+        HORZGUIDE, 84
+        HORZGUIDE, 86
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_PREFERENCES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_PREFERENCES DLGINIT
+BEGIN
+    IDC_CONDITION, 0x403, 5, 0
+0x6954, 0x656d, "\000" 
+    IDC_CONDITION, 0x403, 8, 0
+0x6550, 0x6372, 0x6e65, 0x0074, 
+    IDC_CONDITION, 0x403, 17, 0
+0x6954, 0x656d, 0x6120, 0x646e, 0x5020, 0x7265, 0x6563, 0x746e, "\000" 
+    0
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
