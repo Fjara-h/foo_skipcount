@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9E5C20CC-4E63-4499-9644-AD81E700B0A2}</ProjectGuid>
-    <RootNamespace>foo_enhanced_playcount</RootNamespace>
+    <RootNamespace>foo_skipcount</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>foo_skipcount</ProjectName>
@@ -177,7 +177,7 @@ copy /Y "$(TargetPath)" "D:\Source\foobar2000-2.0_portable\profile\user-componen
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <StringPooling>true</StringPooling>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>..\foobar2000-SDK;..\foobar2000-SDK\foobar2000;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\foobar2000-SDK\foobar2000;..\foobar2000-SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -197,7 +197,7 @@ copy /Y "$(TargetPath)" "D:\Source\foobar2000-2.0_portable\profile\user-componen
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 (x86)\profile\user-components\$(ProjectName)\"
-copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 V1.6\user-components\$(ProjectName)\"
+copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 V1.6\profile\user-components\$(ProjectName)\"
 copy /Y "$(TargetPath)" "$(SolutionDir)..\component\"
 copy /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)..\pdbs\"</Command>
     </PostBuildEvent>

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "globals.h"
 
+#define FOOBAR2000_TARGET_VERSION 80
+
 // Declaration of component's version information
 // Since foobar2000 v1.0 having at least one of these is mandatory to let the troubleshooter tell different versions of the component apart.
 // Note that it is possible to declare multiple components within one DLL, but it's strongly recommended to keep only one declaration per DLL.

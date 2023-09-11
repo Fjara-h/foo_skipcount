@@ -177,11 +177,11 @@ namespace foo_skipcount {
 	// ES_NUMBER only allows valid number characters to be typed or pasted.
 	// This enforces number bounds.
 	void preferences::ConformToBounds(cfg_uint &input, unsigned int min, unsigned int minDefault, unsigned int max, unsigned int maxDefault, int ID) {
-		if(input.get() < min) {
+		if(input.get_value() < min) {
 			input = minDefault;
 			SetDlgItemInt(ID, input, FALSE);
 		}
-		else if(input.get() > max) {
+		else if(input.get_value() > max) {
 			input = maxDefault;
 			SetDlgItemInt(ID, input, FALSE);
 		}

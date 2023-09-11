@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "preferences.h"
 #include "SkipCount.h"
-#include "SDK/playback_control.h"
+#include <mutex>
 
 using namespace pfc;
 
@@ -111,15 +111,15 @@ namespace foo_skipcount {
 
 		record_t record = getRecord(hash);
 		bool didIncrement = false;
-		if(cfg_countNext && control == playback_control::get()->track_command_next) {
+		if(cfg_countNext && control == playback_control::t_track_command::track_command_next) {
 			record.skipCountNext += 1;
 			didIncrement = true;
 		}
-		else if(cfg_countRandom && control == playback_control::get()->track_command_rand) {
+		else if(cfg_countRandom && control == playback_control::t_track_command::track_command_rand) {
 			record.skipCountRandom += 1;
 			didIncrement = true;
 		}
-		else if(cfg_countPrevious && control == playback_control::get()->track_command_prev) {
+		else if(cfg_countPrevious && control == playback_control::t_track_command::track_command_prev) {
 			record.skipCountPrevious += 1;
 			didIncrement = true;
 		}
@@ -194,13 +194,13 @@ namespace foo_skipcount {
 		}
 
 		void on_playback_starting(play_control::t_track_command p_command, bool p_paused) {
-			if(cfg_countNext && p_command == playback_control::get()->track_command_next) {
+			if(cfg_countNext && p_command == playback_control::track_command_next) {
 				shouldCountSkipControl = playback_control::get()->track_command_next;
 			}
-			else if(cfg_countRandom && p_command == playback_control::get()->track_command_rand) {
+			else if(cfg_countRandom && p_command == playback_control::track_command_rand) {
 				shouldCountSkipControl = playback_control::get()->track_command_rand;
 			}
-			else if(cfg_countPrevious && p_command == playback_control::get()->track_command_prev) {
+			else if(cfg_countPrevious && p_command == playback_control::track_command_prev) {
 				shouldCountSkipControl = playback_control::get()->track_command_prev;
 			}
 		}

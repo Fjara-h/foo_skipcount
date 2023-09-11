@@ -12,3 +12,4 @@ src/Debug/
 src/Debug FB2K/
 component/foo_skipcount.dll
 component/x64/foo_skipcount.dll
+src/foo_skipcount.vcxproj.user
