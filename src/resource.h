@@ -11,7 +11,10 @@
 #define IDC_TIME                        1006
 #define IDC_COUNT_FROM_PAUSE            1007
 #define IDC_COUNT_FROM_STOP             1008
-
+#define IDC_LAST_SKIPPED                1009
+#define IDC_SKIP_TIMES                  1010
+#define IDC_SKIP_FIELD_PATTERN          1011
+#define IDC_SKIP_PROTECTION_PREVIOUS    1012
 
 // Next default values for new objects
 // 
@@ -19,7 +22,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        102
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

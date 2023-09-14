@@ -50,26 +50,33 @@ END
 // Dialog
 //
 
-IDD_PREFERENCES DIALOGEX 0, 0, 287, 111
+IDD_PREFERENCES DIALOGEX 0, 0, 288, 159
 STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
 FONT 8, "Microsoft Sans Serif", 400, 0, 0x0
 BEGIN
     CONTROL         "Increment on Next Song press",IDC_COUNT_NEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,18,119,8
     CONTROL         "Increment on Random Song press",IDC_COUNT_RANDOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,29,122,8
     CONTROL         "Increment on Previous Song press",IDC_COUNT_PREVIOUS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,39,124,9
-    LTEXT           "Count skip before:",IDC_STATIC,16,51,75,8
-    COMBOBOX        IDC_CONDITION,75,50,67,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Percent:",IDC_STATIC,30,72,31,8
-    EDITTEXT        IDC_PERCENT,62,70,29,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           " %",IDC_STATIC,91,72,11,10
-    LTEXT           "Duration:",IDC_STATIC,30,86,28,8
-    EDITTEXT        IDC_TIME,62,84,54,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           " sec",IDC_STATIC,116,86,18,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,40,124,8
+    LTEXT           "Count skip before:",IDC_STATIC,26,52,59,8
+    COMBOBOX        IDC_CONDITION,85,50,67,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Percent:",IDC_STATIC,26,67,27,8
+    EDITTEXT        IDC_PERCENT,55,66,29,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           " %",IDC_STATIC,85,67,10,8
+    LTEXT           "Duration:",IDC_STATIC,26,83,28,8
+    EDITTEXT        IDC_TIME,55,81,54,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           " sec",IDC_STATIC,109,83,15,10
     CONTROL         "Allow increment from paused",IDC_COUNT_FROM_PAUSE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,158,18,113,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,18,96,8
     CONTROL         "Allowed increment from stopped",IDC_COUNT_FROM_STOP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,158,29,113,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,29,113,8
+    CONTROL         "Log last date skipped",IDC_LAST_SKIPPED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,96,82,9
+    CONTROL         "Log skip times",IDC_SKIP_TIMES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,108,63,8
+    LTEXT           "Field pattern: %",IDC_STATIC,26,121,50,8
+    CTEXT           "%",IDC_STATIC,131,121,8,8
+    EDITTEXT        IDC_SKIP_FIELD_PATTERN,77,119,54,12,ES_AUTOHSCROLL
+    CONTROL         "Skip Protection: Disable counting increments for 1s after using Previous",IDC_SKIP_PROTECTION_PREVIOUS,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,16,134,246,8
 END
 
 
@@ -84,25 +91,35 @@ BEGIN
     IDD_PREFERENCES, DIALOG
     BEGIN
         LEFTMARGIN, 16
-        RIGHTMARGIN, 271
-        VERTGUIDE, 30
-        VERTGUIDE, 62
-        VERTGUIDE, 91
-        VERTGUIDE, 158
+        RIGHTMARGIN, 272
+        VERTGUIDE, 26
+        VERTGUIDE, 152
+        VERTGUIDE, 162
+        VERTGUIDE, 194
         TOPMARGIN, 18
-        BOTTOMMARGIN, 97
-        HORZGUIDE, 27
+        BOTTOMMARGIN, 145
+        HORZGUIDE, 26
         HORZGUIDE, 29
         HORZGUIDE, 37
-        HORZGUIDE, 39
-        HORZGUIDE, 48
+        HORZGUIDE, 40
+        HORZGUIDE, 47
         HORZGUIDE, 50
-        HORZGUIDE, 51
-        HORZGUIDE, 70
-        HORZGUIDE, 72
-        HORZGUIDE, 82
-        HORZGUIDE, 84
-        HORZGUIDE, 86
+        HORZGUIDE, 60
+        HORZGUIDE, 63
+        HORZGUIDE, 66
+        HORZGUIDE, 75
+        HORZGUIDE, 78
+        HORZGUIDE, 81
+        HORZGUIDE, 83
+        HORZGUIDE, 93
+        HORZGUIDE, 96
+        HORZGUIDE, 105
+        HORZGUIDE, 108
+        HORZGUIDE, 116
+        HORZGUIDE, 119
+        HORZGUIDE, 129
+        HORZGUIDE, 131
+        HORZGUIDE, 134
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -115,23 +132,6 @@ END
 
 IDD_PREFERENCES AFX_DIALOG_LAYOUT
 BEGIN
-    0
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog Info
-//
-
-IDD_PREFERENCES DLGINIT
-BEGIN
-    IDC_CONDITION, 0x403, 5, 0
-0x6954, 0x656d, "\000" 
-    IDC_CONDITION, 0x403, 8, 0
-0x6550, 0x6372, 0x6e65, 0x0074, 
-    IDC_CONDITION, 0x403, 17, 0
-0x6954, 0x656d, 0x6120, 0x646e, 0x5020, 0x7265, 0x6563, 0x746e, "\000" 
     0
 END
 
