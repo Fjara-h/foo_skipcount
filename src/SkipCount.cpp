@@ -2,6 +2,7 @@
 #include "preferences.h"
 #include "SkipCount.h"
 #include <mutex>
+#include <vector>
 
 using namespace pfc;
 
@@ -12,54 +13,18 @@ namespace foo_skipcount {
 	static const char strPinTo[] = "%artist% - $year($if2(%date%,%original release date%)) - %album% $if2(%discnumber%,1)-%tracknumber% %title%";
 
 	std::atomic<bool> quitting = false;
-
-	void mb_to_lower(const char* src, pfc::string_base& dest) {
-		for(;;) {
-			unsigned c1;
-			t_size d1;
-			d1 = utf8_decode_char(src, c1);
-			if(d1 == 0) {
-				break;
-			}
-			else {
-				dest.add_char(charLower(c1));
-			}
-			src += d1;
-		}
+	void foobarQuitting() {
+		quitting = true;
+		// Cleanly kill g_cachedAPI before reaching static object destructors or else
+		g_cachedAPI.release();
 	}
 
-	metadb_index_client_impl::metadb_index_client_impl(const char* pinTo, bool toLower = false) {
-		static_api_ptr_t<titleformat_compiler>()->compile_force(m_keyObj, pinTo);
-		forceLowercase = toLower;
+	void refreshSingle(GUID guid_foo_skipcount_index, metadb_index_hash hash) {
+		g_cachedAPI->dispatch_refresh(guid_foo_skipcount_index, hash);
 	}
 
-	metadb_index_hash metadb_index_client_impl::transform(const file_info& info, const playable_location& location) {
-		pfc::string_formatter str, str_lower;
-		pfc::string_formatter* strPtr = &str;
-		m_keyObj->run_simple(location, &info, str);
-		if(forceLowercase) {
-			mb_to_lower(str, str_lower);
-			strPtr = &str_lower;
-		}
-		// Make MD5 hash of the string, then reduce it to 64-bit metadb_index_hash
-		return static_api_ptr_t<hasher_md5>()->process_single_string(*strPtr).xorHalve();
-	}
-
-	service_ptr_t<metadb_index_client_impl> clientByGUID(const GUID& guid) {
-		service_ptr_t<metadb_index_client_impl> g_clientIndex = new service_impl_t<metadb_index_client_impl>(strPinTo, true);
-		PFC_ASSERT(guid == guid_foo_skipcount_index);
-		return g_clientIndex;
-	}
-
-	// Static cached ptr to metadb_index_manager
-	// Cached because we'll be calling it a lot on per-track basis, let's not pass it everywhere to low level functions
-	// Obtaining the pointer from core is reasonably efficient - log(n) to the number of known service classes, but not good enough for something potentially called hundreds of times
-	static metadb_index_manager::ptr theAPI() {
-		auto ret = g_cachedAPI;
-		if(ret.is_empty()) {
-			ret = metadb_index_manager::get(); // since fb2k SDK v1.4, core API interfaces have a static get() method
-		}
-		return ret;
+	void refreshGlobal() {
+		g_cachedAPI->dispatch_global_refresh();
 	}
 
 	// Called from init_stage_callback to hook into metadb
@@ -71,39 +36,41 @@ namespace foo_skipcount {
 		// This will fail if the files holding component data are somehow corrupted.
 		try {
 			api->add(clientByGUID(guid_foo_skipcount_index), guid_foo_skipcount_index, retentionPeriod);
-		}
-		catch(std::exception const& e) {
+		} catch(std::exception const& e) {
 			api->remove(guid_foo_skipcount_index);
-			FB2K_console_formatter() << "foo_skipcount: Critical initialization failure: " << e;
+			FB2K_console_formatter() << COMPONENT_NAME ": Critical initialization failure: " << e;
 			return;
 		}
 		api->dispatch_global_refresh();
 	}
 
-	void foobarQuitting() {
-		quitting = true;
-		// Cleanly kill g_cachedAPI before reaching static object destructors or else
-		g_cachedAPI.release();
-	}
+	class my_metadb_io_edit_callback : public metadb_io_edit_callback {
+	public:
+		typedef const pfc::list_base_const_t<const file_info*>& t_infosref;
+		void on_edited(metadb_handle_list_cref items, t_infosref before, t_infosref after) {
+			for(size_t t = 0; t < items.get_count(); t++) {
+				metadb_index_hash hashOld, hashNew;
+				static hasher_md5::ptr hasher = hasher_md5::get();
 
-	record_t getRecord(metadb_index_hash hash, const GUID index_guid) {
-		unsigned int buf[4];
-		record_t record;
-		size_t size = 0;
-		size = theAPI()->get_user_data_here(index_guid, hash, &buf, sizeof(buf));
-		if(size == 0) {
-			return record;
+				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hashOld);
+
+				auto playable_location = make_playable_location(items[t]->get_path(), items[t]->get_subsong_index());
+				hashNew = clientByGUID(guid_foo_skipcount_index)->transform(*after[t], playable_location);
+				if(hashOld != hashNew) {
+					record_t oldRecord = getRecord(hashOld);
+
+					// Does this need to care about timestamps or lastskipped at all? Should I create a new record?
+					if(oldRecord.skipCountNext > 0 || oldRecord.skipCountRandom > 0 || oldRecord.skipCountPrevious > 0) {
+						record_t newRecord = getRecord(hashNew);
+						if(newRecord.skipCountNext + newRecord.skipCountPrevious + newRecord.skipCountRandom <= oldRecord.skipCountNext + oldRecord.skipCountRandom + oldRecord.skipCountPrevious) {
+							setRecord(hashNew, oldRecord);
+						}
+					}
+				}
+			}
 		}
-
-		if(buf[0] == 1) {
-			record.version = buf[0];
-			record.skipCountNext = buf[1];
-			record.skipCountRandom = buf[2];
-			record.skipCountPrevious = buf[3];
-		}
-
-		return record;
-	}
+	};
+	static service_factory_single_t<my_metadb_io_edit_callback> g_my_metadb_io;
 
 	void on_item_skipped(metadb_handle_ptr p_item, unsigned int control) {
 		metadb_index_hash hash;
@@ -124,58 +91,14 @@ namespace foo_skipcount {
 			didIncrement = true;
 		}
 		if(didIncrement) {
+			t_filetimestamp time = filetimestamp_from_system_timer();
+			record.lastSkip = time;
+			record.skipTimesCounter++;
+			record.skipTimes.push_back(time);
 			setRecord(hash, record);
-			RefreshSingle(guid_foo_skipcount_index, hash);
+			refreshSingle(guid_foo_skipcount_index, hash);
 		}
 	}
-
-	void RefreshSingle(GUID guid_foo_skipcount_index, metadb_index_hash hash) {
-		fb2k::inMainThread([=] {theAPI()->dispatch_refresh(guid_foo_skipcount_index, hash); });
-	}
-
-	void RefreshGlobal() {
-		fb2k::inMainThread([=] {theAPI()->dispatch_global_refresh(); });
-	}
-
-
-	std::mutex set_record_mutex;
-	static void setRecord(metadb_index_hash hash, record_t record, const GUID index_guid) {
-		unsigned int buf[4]{};
-		buf[0] = kCurrRecordVersion;
-		buf[1] = record.skipCountNext;
-		buf[2] = record.skipCountRandom;
-		buf[3] = record.skipCountPrevious;
-
-		std::lock_guard<std::mutex> guard(set_record_mutex);
-		theAPI()->set_user_data(index_guid, hash, buf, sizeof(buf));
-	}
-
-	class metadb_io_edit_callback_impl : public metadb_io_edit_callback {
-	public:
-		typedef const pfc::list_base_const_t<const file_info*>& t_infosref;
-		void on_edited(metadb_handle_list_cref items, t_infosref before, t_infosref after) {
-			for(size_t t = 0; t < items.get_count(); t++) {
-				metadb_index_hash hashOld, hashNew;
-				static hasher_md5::ptr hasher = hasher_md5::get();
-
-				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hashOld);
-
-				auto playable_location = make_playable_location(items[t]->get_path(), items[t]->get_subsong_index());
-				hashNew = clientByGUID(guid_foo_skipcount_index)->transform(*after[t], playable_location);
-				if(hashOld != hashNew) {
-					record_t oldRecord = getRecord(hashOld);
-					if(oldRecord.skipCountNext > 0 || oldRecord.skipCountRandom > 0 || oldRecord.skipCountPrevious > 0) {
-						record_t newRecord = getRecord(hashNew);
-						if(newRecord.skipCountNext + newRecord.skipCountPrevious + newRecord.skipCountRandom <= oldRecord.skipCountNext + oldRecord.skipCountRandom + oldRecord.skipCountPrevious) {
-							setRecord(hashNew, oldRecord);
-						}
-					}
-				}
-			}
-		}
-	};
-
-	static service_factory_single_t<metadb_io_edit_callback_impl> g_my_metadb_io;
 
 	class my_play_callback : public play_callback_static {
 	public:
@@ -189,8 +112,15 @@ namespace foo_skipcount {
 			if(!previousTrack.is_empty() && shouldCountSkipControl > 0 && shouldCountSkipCondition) {
 				on_item_skipped(previousTrack, shouldCountSkipControl);
 			}
+
+			if(cfg_skipProtectionPrevious && shouldCountSkipControl == playback_control::track_command_prev) {
+				shouldCountSkipCondition = false;
+			}
+			else {
+				shouldCountSkipCondition = true;
+			}
 			shouldCountSkipControl = 0;
-			shouldCountSkipCondition = true;
+			usedSkipProtection = false;
 		}
 
 		void on_playback_starting(play_control::t_track_command p_command, bool p_paused) {
@@ -229,6 +159,18 @@ namespace foo_skipcount {
 		void on_playback_dynamic_info(const file_info& p_info) {}
 		void on_playback_dynamic_info_track(const file_info& p_info) {}
 		void on_playback_time(double p_time) {
+			if(cfg_skipProtectionPrevious && !shouldCountSkipCondition && !usedSkipProtection) {
+				if(p_time >= 1) { // >1 or >=1 or >0
+					shouldCountSkipCondition = true;
+					usedSkipProtection = true;
+				}
+			}
+			// If user has cfg_time set to 1, it will never be incremented, so just -1 for that specific scenario
+			// Does this and the above work how I intend it to?
+			if(p_time >= 1 && usedSkipProtection && cfg_skipProtectionPrevious) {
+				p_time--;
+			}
+
 			if(shouldCountSkipCondition) {
 				if(cfg_condition == TIME && p_time >= double(cfg_time)) {
 					shouldCountSkipCondition = false;
@@ -249,15 +191,68 @@ namespace foo_skipcount {
 		}
 	private:
 		metadb_handle_ptr currentTrack, previousTrack;
-		bool shouldCountSkipCondition = false;
+		bool shouldCountSkipCondition = false, usedSkipProtection = false;
 		unsigned int shouldCountSkipControl = 0;
 		double currentTrackTotalDuration = 0;
 	};
 
-	static service_factory_single_t<my_play_callback> g_play_callback_static_factory;
+	static service_factory_single_t<my_play_callback> g_my_play_callback;
 
-	// Context Menu functions start here
-	void ClearSkipCountRecords(metadb_handle_list_cref items) {
+	void copyTimestampsToVector(t_filetimestamp* buf, t_uint skipTimeElementCount, std::vector<t_filetimestamp>& v) {
+		v.insert(v.begin(), buf, buf + skipTimeElementCount);
+	}
+
+	//this is crashing
+	record_t getRecord(metadb_index_hash hash, const GUID index_guid) {
+		t_uint* buf = new t_uint[10006];
+		record_t record;
+		size_t size = 0;
+		size = theAPI()->get_user_data_here(index_guid, hash, &buf, sizeof(buf));
+		if(size == 0) {
+			return record;
+		}
+
+		if(buf[0] == 1) {
+			record.version = buf[0];
+			record.skipCountNext = buf[1];
+			record.skipCountRandom = buf[2];
+			record.skipCountPrevious = buf[3];
+		}
+		else if(buf[0] == 2) {
+			record.version = buf[0];
+			record.skipCountNext = buf[1];
+			record.skipCountRandom = buf[2];
+			record.skipCountPrevious = buf[3];
+			record.skipTimesCounter = buf[4];
+			record.lastSkip = buf[5];
+			if(record.skipTimesCounter > 0) {
+				copyTimestampsToVector((t_filetimestamp*)&buf[6], record.skipTimesCounter, record.skipTimes);
+			}
+		}
+
+		return record;
+	}
+
+	//crashing on clear timestamp
+	std::mutex set_record_mutex;
+	static void setRecord(metadb_index_hash hash, record_t record, const GUID index_guid) {
+		t_uint* buf = new t_uint[10006];
+		record.version = CURRENT_RECORD_VERSION;
+		// Copy over the first six (non-vector) settings
+		memcpy(buf, &record, 6 * sizeof(t_uint)); // should this be t_uint?
+		size_t size = 6 * sizeof(t_uint);
+		// Copy over the vector
+		if(record.skipTimesCounter > 0) {
+			memcpy(buf + size, &record.skipTimes[0], record.skipTimes.size() * sizeof (t_filetimestamp ));
+			size += record.skipTimes.size() * sizeof t_filetimestamp / sizeof(t_uint);
+		}
+
+		std::lock_guard<std::mutex> guard(set_record_mutex);
+		theAPI()->set_user_data(index_guid, hash, buf, size * sizeof(t_uint));
+	}
+
+	// Context Menu functions
+	void clearRecords(metadb_handle_list_cref items) {
 		try {
 			if(items.get_count() == 0) {
 				throw pfc::exception_invalid_params();
@@ -284,9 +279,88 @@ namespace foo_skipcount {
 			}
 
 			theAPI()->dispatch_refresh(guid_foo_skipcount_index, hashes);
-		}
-		catch(std::exception const& e) {
+		} catch(std::exception const& e) {
 			popup_message::g_complain("Could not clear skip information", e);
 		}
+	}
+
+	void clearTimestamps(metadb_handle_list_cref items) {
+		try {
+			if(items.get_count() == 0) {
+				throw pfc::exception_invalid_params();
+			}
+
+			pfc::avltree_t<metadb_index_hash> tmp;
+
+			for(size_t t = 0; t < items.get_count(); t++) {
+				metadb_index_hash hash;
+				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
+
+				record_t record = getRecord(hash);
+				record.skipTimes.clear();
+				setRecord(hash, record);
+				tmp += hash;
+			}
+
+			pfc::list_t<metadb_index_hash> hashes;
+			for(auto iter = tmp.first(); iter.is_valid(); iter++) {
+				const metadb_index_hash hash = *iter;
+				hashes += hash;
+			}
+
+			theAPI()->dispatch_refresh(guid_foo_skipcount_index, hashes);
+		} catch(std::exception const& e) {
+			popup_message::g_complain("Could not clear skip information", e);
+		}
+	}
+	// END: Context Menu functions
+
+	// Static cached ptr to metadb_index_manager
+	// Cached because there are many calls on a per-track basis, avoid passing always to low level functions
+	// Obtaining the pointer from core is reasonably efficient - log(n) to the number of known service classes, but not good enough for something potentially called hundreds of times
+	static metadb_index_manager::ptr theAPI() {
+		auto ret = g_cachedAPI;
+		if(ret.is_empty()) {
+			ret = metadb_index_manager::get(); // since fb2k SDK v1.4, core API interfaces have a static get() method
+		}
+		return ret;
+	}
+
+	my_metadb_index_client::my_metadb_index_client(const char* pinTo, bool toLower = false) {
+		static_api_ptr_t<titleformat_compiler>()->compile_force(m_keyObj, pinTo);
+		forceLowercase = toLower;
+	}
+
+	void mb_to_lower(const char* src, pfc::string_base& dest) {
+		for(;;) {
+			unsigned c1;
+			t_size d1;
+			d1 = utf8_decode_char(src, c1);
+			if(d1 == 0) {
+				break;
+			}
+			else {
+				dest.add_char(charLower(c1));
+			}
+			src += d1;
+		}
+	}
+
+	metadb_index_hash my_metadb_index_client::transform(const file_info& info, const playable_location& location) {
+		pfc::string_formatter str, str_lower;
+		pfc::string_formatter* strPtr = &str;
+		m_keyObj->run_simple(location, &info, str);
+		if(forceLowercase) {
+			mb_to_lower(str, str_lower);
+			strPtr = &str_lower;
+		}
+		// Make MD5 hash of the string, then reduce it to 64-bit metadb_index_hash
+		return static_api_ptr_t<hasher_md5>()->process_single_string(*strPtr).xorHalve();
+	}
+
+	service_ptr_t<my_metadb_index_client> clientByGUID(const GUID& guid) {
+		service_ptr_t<my_metadb_index_client> g_clientIndex = new service_impl_t<my_metadb_index_client>(strPinTo, true);
+		PFC_ASSERT(guid == guid_foo_skipcount_index);
+		return g_clientIndex;
 	}
 }
