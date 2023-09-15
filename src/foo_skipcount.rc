@@ -67,7 +67,7 @@ BEGIN
     EDITTEXT        IDC_TIME,55,81,54,12,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           " sec",IDC_STATIC,109,83,15,10
     CONTROL         "Allow increment from paused",IDC_COUNT_FROM_PAUSE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,18,96,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,18,110,8
     CONTROL         "Allowed increment from stopped",IDC_COUNT_FROM_STOP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,29,113,8
     CONTROL         "Log last date skipped",IDC_LAST_SKIPPED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,96,82,9

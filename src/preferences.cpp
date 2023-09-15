@@ -55,34 +55,24 @@ namespace foo_skipcount {
 		// Enable dark mode
 		m_dark.AddDialogWithControls(*this);
 
-		SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_SETCHECK, cfg_countNext, NULL);
-		SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_SETCHECK, cfg_countRandom, NULL);
-		SendMessageW(GetDlgItem(IDC_COUNT_PREVIOUS), BM_SETCHECK, cfg_countPrevious, NULL);
-		{
-			static const WCHAR* CondtionType[] = {
-				L"Time",
-				L"Percent",
-				L"Time and Percent",
-			};
+		SendDlgItemMessage(IDC_COUNT_NEXT, BM_SETCHECK, cfg_countNext);
+		SendDlgItemMessage(IDC_COUNT_RANDOM, BM_SETCHECK, cfg_countRandom);
+		SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_SETCHECK, cfg_countPrevious);
 
-			{
-				auto conditionDropList = (CComboBox)GetDlgItem(IDC_CONDITION);
+		CComboBox conditionDropList = (CComboBox)GetDlgItem(IDC_CONDITION);
+		::uSendMessageText(conditionDropList, CB_ADDSTRING, 0, "Time");
+		::uSendMessageText(conditionDropList, CB_ADDSTRING, 0, "Percent");
+		::uSendMessageText(conditionDropList, CB_ADDSTRING, 0, "Time and Percent");
+		::SendMessage(conditionDropList, CB_SETCURSEL, (WPARAM)cfg_condition, NULL);
 
-				for(size_t i = 0; i < _countof(CondtionType); i++) {
-					conditionDropList.AddString(CondtionType[i]);
-				}
-
-				conditionDropList.SetCurSel(cfg_condition);
-			}
-		}
-		SetDlgItemInt(IDC_PERCENT, (UINT)cfg_percent, FALSE);
-		SetDlgItemInt(IDC_TIME, (UINT)cfg_time, FALSE);
-		SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_SETCHECK, cfg_countFromPause, NULL);
-		SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_SETCHECK, cfg_countFromStop, NULL);
+		SetDlgItemInt(IDC_PERCENT, cfg_percent, FALSE);
+		SetDlgItemInt(IDC_TIME, cfg_time, FALSE);
+		SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_SETCHECK, cfg_countFromPause);
+		SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_SETCHECK, cfg_countFromStop);
+		SendDlgItemMessage(IDC_LAST_SKIPPED, BM_SETCHECK, cfg_lastSkip);
+		SendDlgItemMessage(IDC_SKIP_TIMES, BM_SETCHECK, cfg_skipTimes);
 		uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, cfg_skipFieldPattern);
-		SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_SETCHECK, cfg_lastSkip, NULL);
-		SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_SETCHECK, cfg_skipTimes, NULL);
-		SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_SETCHECK, cfg_skipProtectionPrevious, NULL);
+		SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_SETCHECK, cfg_skipProtectionPrevious);
 
 		CreateTooltip(tooltips[0], m_hWnd, IDC_COUNT_NEXT,
 			L"Add to skip count after pressing next song",
@@ -151,7 +141,7 @@ namespace foo_skipcount {
 	}
 
 	void my_preferences::CreateTooltip(CToolTipCtrl tooltip, CWindow hWnd, int parent, LPCTSTR title, LPCTSTR body) {
-		if (tooltip.Create(hWnd, nullptr, nullptr, TTS_NOPREFIX | TTS_BALLOON)) {
+		if(tooltip.Create(hWnd, nullptr, nullptr, TTS_NOPREFIX | TTS_BALLOON)) {
 			CToolInfo toolInfo(TTF_IDISHWND | TTF_SUBCLASS | TTF_CENTERTIP,	GetDlgItem(parent), 0, nullptr, nullptr);
 			HICON icon = 0;
 			tooltip.AddTool(&toolInfo);
@@ -181,42 +171,39 @@ namespace foo_skipcount {
 	}
 
 	void my_preferences::reset() {
-		SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_SETCHECK, default_cfg_countNext, NULL);
-		SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_SETCHECK, default_cfg_countRandom, NULL);
-		SendMessageW(GetDlgItem(IDC_COUNT_PREVIOUS), BM_SETCHECK, default_cfg_countPrevious, NULL);
-		SendMessageW(GetDlgItem(IDC_CONDITION), CB_SETCURSEL, default_cfg_condition, NULL);
+		SendDlgItemMessage(IDC_COUNT_NEXT, BM_SETCHECK, default_cfg_countNext);
+		SendDlgItemMessage(IDC_COUNT_RANDOM, BM_SETCHECK, default_cfg_countRandom);
+		SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_SETCHECK, default_cfg_countPrevious);
+		GetDlgItem(IDC_CONDITION).SendMessage(CB_SETCURSEL, (WPARAM)default_cfg_condition, NULL);
 		SetDlgItemInt(IDC_PERCENT, default_cfg_percent, FALSE);
 		SetDlgItemInt(IDC_TIME, default_cfg_time, FALSE);
-		SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_SETCHECK, default_cfg_countFromPause, NULL);
-		SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_SETCHECK, default_cfg_countFromStop, NULL);
+		SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_SETCHECK, default_cfg_countFromPause);
+		SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_SETCHECK, default_cfg_countFromStop);
+		SendDlgItemMessage(IDC_LAST_SKIPPED, BM_SETCHECK, default_cfg_lastSkip);
+		SendDlgItemMessage(IDC_SKIP_TIMES, BM_SETCHECK, default_cfg_skipTimes);
 		uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, default_cfg_skipFieldPattern);
-		SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_SETCHECK, default_cfg_lastSkip, NULL);
-		SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_SETCHECK, default_cfg_skipTimes, NULL);
-		SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_SETCHECK, default_cfg_skipProtectionPrevious, NULL);
+		SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_SETCHECK, default_cfg_skipProtectionPrevious);
 		OnChanged();
 	}
 
-	// During the applies, check that percent and time are within the correct bounds. 0-100 and 0 - 2000000000
 	void my_preferences::apply() {
-		cfg_countNext = SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
-		cfg_countRandom = SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
-		cfg_countPrevious = SendMessageW(GetDlgItem(IDC_COUNT_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
-		cfg_condition = SendMessageW(GetDlgItem(IDC_CONDITION), CB_GETCURSEL, NULL, NULL);
-		cfg_percent = GetDlgItemInt(IDC_PERCENT, NULL, FALSE);
-		ConformToBounds(cfg_percent, 0, default_cfg_percent, 100, 100, IDC_PERCENT);
-		cfg_time = GetDlgItemInt(IDC_TIME, NULL, FALSE);
-		ConformToBounds(cfg_time, 0, default_cfg_time, 2000000000, 1000, IDC_TIME); // Approx half UINT_MAX
-		cfg_countFromPause = SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
-		cfg_countFromStop = SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
+		cfg_countNext = (t_int32)SendDlgItemMessage(IDC_COUNT_NEXT, BM_GETCHECK);
+		cfg_countRandom = (t_int32)SendDlgItemMessage(IDC_COUNT_RANDOM, BM_GETCHECK);
+		cfg_countPrevious = (t_int32)SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_GETCHECK);
+		cfg_condition = (t_int32)SendDlgItemMessage(IDC_CONDITION, CB_GETCURSEL);
+		cfg_percent = GetIntConformedToBounds(IDC_PERCENT, 0, default_cfg_percent, 100, 100);
+		cfg_time = GetIntConformedToBounds(IDC_TIME, 0, default_cfg_time, 1000000000, 1000);
+		cfg_countFromPause = (t_int32)SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_GETCHECK);
+		cfg_countFromStop = (t_int32)SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_GETCHECK);
+		cfg_lastSkip = (t_int32)SendDlgItemMessage(IDC_LAST_SKIPPED, BM_GETCHECK);
+		cfg_skipTimes = (t_int32)SendDlgItemMessage(IDC_LAST_SKIPPED, BM_GETCHECK);
 		pfc::string8_fast text;
 		uGetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, text);
 		if(text.get_length() == 0) {
 			uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, default_cfg_skipFieldPattern);
 		}
 		cfg_skipFieldPattern = text.get_ptr();
-		cfg_lastSkip = SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
-		cfg_skipTimes = SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
-		cfg_skipProtectionPrevious = SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
+		cfg_skipProtectionPrevious = (t_int32)SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_GETCHECK);
 
 		refreshGlobal();
 		OnChanged(); // Dialog content has not changed but the flags have - shown values now match the settings so the apply button can be disabled
@@ -224,21 +211,29 @@ namespace foo_skipcount {
 
 	// ES_NUMBER only allows valid number characters to be typed or pasted.
 	// This enforces number bounds.
-	void my_preferences::ConformToBounds(cfg_uint &input, t_uint min, t_uint minDefault, t_uint max, t_uint maxDefault, int ID) {
-		if(input.get_value() < min) {
-			input = minDefault;
-			SetDlgItemInt(ID, input, FALSE);
+	t_uint32 my_preferences::GetIntConformedToBounds(int ID, t_int32 min, t_int32 minDefault, t_int32 max, t_int32 maxDefault) {
+		t_int32 userInput = (t_int32)GetDlgItemInt(ID, NULL, FALSE);
+		if(userInput < min) {
+			SetDlgItemInt(ID, minDefault, FALSE);
+			return minDefault;
 		}
-		else if(input.get_value() > max) {
-			input = maxDefault;
-			SetDlgItemInt(ID, input, FALSE);
+		else if(userInput > max) {
+			SetDlgItemInt(ID, maxDefault, FALSE);
+			return maxDefault;
+		}
+		else {
+			return userInput;
 		}
 	}
 
 	// Is there a less horrendous way to do this?
 	bool my_preferences::HasChanged() {
-		pfc::string8 tempPattern;
-		uGetDlgItemText(GetDlgItem(IDC_SKIP_FIELD_PATTERN), IDC_SKIP_FIELD_PATTERN, tempPattern);
+		pfc::string8 _skipFieldPattern;
+		uGetDlgItemText(GetDlgItem(IDC_SKIP_FIELD_PATTERN), IDC_SKIP_FIELD_PATTERN, _skipFieldPattern);
+		if(_skipFieldPattern != cfg_skipFieldPattern) {
+			return true;
+		}
+				
 		// Returns whether the settings are different from the current configuration - (De)activating the apply button
 		return (SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countNext ||
 			(SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countRandom ||
@@ -248,7 +243,6 @@ namespace foo_skipcount {
 			GetDlgItemInt(IDC_TIME, NULL, FALSE) != cfg_time ||
 			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromPause ||
 			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromStop ||
-			tempPattern != cfg_skipFieldPattern ||
 			(SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_skipTimes ||
 			(SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_lastSkip ||
 			(SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_skipProtectionPrevious;

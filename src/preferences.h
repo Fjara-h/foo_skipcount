@@ -100,7 +100,7 @@ namespace foo_skipcount {
 		void my_preferences::OnEditChange(UINT, int, CWindow);
 		void my_preferences::OnSelectionChange(UINT, int, CWindow);
 		bool my_preferences::HasChanged();
-		void my_preferences::ConformToBounds(cfg_uint&, t_uint, t_uint, t_uint, t_uint, int);
+		t_uint32 my_preferences::GetIntConformedToBounds(int, t_int32, t_int32, t_int32, t_int32);
 		void my_preferences::OnChanged();
 
 		const preferences_page_callback::ptr m_callback;

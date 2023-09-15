@@ -28,7 +28,7 @@ namespace foo_skipcount {
 	}
 
 	// Called from init_stage_callback to hook into metadb
-	// This is done properly, early, to prevent dispatch_global_refresh() from new added fields from hammering playlists, etc.
+	// This is done properly, early, to prevent dispatch_global_refresh() with newly added fields from hammering playlists, etc.
 	void addMetadbIndexes() {
 		auto api = metadb_index_manager::get();
 		g_cachedAPI = api;
@@ -58,8 +58,6 @@ namespace foo_skipcount {
 				hashNew = clientByGUID(guid_foo_skipcount_index)->transform(*after[t], playable_location);
 				if(hashOld != hashNew) {
 					record_t oldRecord = getRecord(hashOld);
-
-					// Does this need to care about timestamps or lastskipped at all? Should I create a new record?
 					if(oldRecord.skipCountNext > 0 || oldRecord.skipCountRandom > 0 || oldRecord.skipCountPrevious > 0) {
 						record_t newRecord = getRecord(hashNew);
 						if(newRecord.skipCountNext + newRecord.skipCountPrevious + newRecord.skipCountRandom <= oldRecord.skipCountNext + oldRecord.skipCountRandom + oldRecord.skipCountPrevious) {
@@ -72,7 +70,7 @@ namespace foo_skipcount {
 	};
 	static service_factory_single_t<my_metadb_io_edit_callback> g_my_metadb_io;
 
-	void on_item_skipped(metadb_handle_ptr p_item, unsigned int control) {
+	void on_item_skipped(metadb_handle_ptr p_item, int control) {
 		metadb_index_hash hash;
 		clientByGUID(guid_foo_skipcount_index)->hashHandle(p_item, hash);
 
@@ -92,9 +90,13 @@ namespace foo_skipcount {
 		}
 		if(didIncrement) {
 			t_filetimestamp time = filetimestamp_from_system_timer();
-			record.lastSkip = time;
-			record.skipTimesCounter++;
-			record.skipTimes.push_back(time);
+			if(cfg_lastSkip) {
+				record.lastSkip = time;
+			}
+			if(cfg_skipTimes) {
+				record.skipTimesCounter++;
+				record.skipTimes.push_back(time);
+			}			
 			setRecord(hash, record);
 			refreshSingle(guid_foo_skipcount_index, hash);
 		}
@@ -159,15 +161,12 @@ namespace foo_skipcount {
 		void on_playback_dynamic_info(const file_info& p_info) {}
 		void on_playback_dynamic_info_track(const file_info& p_info) {}
 		void on_playback_time(double p_time) {
-			if(cfg_skipProtectionPrevious && !shouldCountSkipCondition && !usedSkipProtection) {
-				if(p_time >= 1) { // >1 or >=1 or >0
-					shouldCountSkipCondition = true;
-					usedSkipProtection = true;
-				}
+			if(cfg_skipProtectionPrevious && !usedSkipProtection && p_time >= 1) {
+				shouldCountSkipCondition = true;
+				usedSkipProtection = true;
 			}
 			// If user has cfg_time set to 1, it will never be incremented, so just -1 for that specific scenario
-			// Does this and the above work how I intend it to?
-			if(p_time >= 1 && usedSkipProtection && cfg_skipProtectionPrevious) {
+			if(cfg_skipProtectionPrevious && usedSkipProtection && p_time >= 1) {
 				p_time--;
 			}
 
@@ -198,20 +197,20 @@ namespace foo_skipcount {
 
 	static service_factory_single_t<my_play_callback> g_my_play_callback;
 
-	void copyTimestampsToVector(t_filetimestamp* buf, t_uint skipTimeElementCount, std::vector<t_filetimestamp>& v) {
-		v.insert(v.begin(), buf, buf + skipTimeElementCount);
+	void copyTimestampsToVector(std::vector<t_filetimestamp>& dest, t_filetimestamp* src, unsigned int elementCount) {
+		dest.insert(dest.begin(), src, src + elementCount);
 	}
 
 	//this is crashing
 	record_t getRecord(metadb_index_hash hash, const GUID index_guid) {
-		t_uint* buf = new t_uint[10006];
+		unsigned int buf[10004];
 		record_t record;
 		size_t size = 0;
 		size = theAPI()->get_user_data_here(index_guid, hash, &buf, sizeof(buf));
-		if(size == 0) {
+		if(!size) {
 			return record;
 		}
-
+		
 		if(buf[0] == 1) {
 			record.version = buf[0];
 			record.skipCountNext = buf[1];
@@ -224,35 +223,42 @@ namespace foo_skipcount {
 			record.skipCountRandom = buf[2];
 			record.skipCountPrevious = buf[3];
 			record.skipTimesCounter = buf[4];
-			record.lastSkip = buf[5];
+			memcpy(&record.lastSkip, (t_filetimestamp*)&buf[5], sizeof(t_filetimestamp));
 			if(record.skipTimesCounter > 0) {
-				copyTimestampsToVector((t_filetimestamp*)&buf[6], record.skipTimesCounter, record.skipTimes);
+				copyTimestampsToVector(record.skipTimes, (t_filetimestamp*)&buf[6], record.skipTimesCounter);
 			}
 		}
-
 		return record;
 	}
 
-	//crashing on clear timestamp
+	// check memory accessor positions
 	std::mutex set_record_mutex;
 	static void setRecord(metadb_index_hash hash, record_t record, const GUID index_guid) {
-		t_uint* buf = new t_uint[10006];
+		unsigned int* buf = new unsigned int[10006];
+
+		// Update record version before new set
 		record.version = CURRENT_RECORD_VERSION;
-		// Copy over the first six (non-vector) settings
-		memcpy(buf, &record, 6 * sizeof(t_uint)); // should this be t_uint?
-		size_t size = 6 * sizeof(t_uint);
-		// Copy over the vector
+		// Copy over the first five (non-vector, non-timestamp) settings
+		memcpy(buf, &record, 5 * sizeof(int));
+		size_t size = 5;
+
+		// Copy lastSkip timestamp
+		memcpy(&buf[5], &record.lastSkip, sizeof(t_filetimestamp));
+
+		size += sizeof(t_filetimestamp) / sizeof(int);
+		// Copy over the vector of skip timestamps
 		if(record.skipTimesCounter > 0) {
-			memcpy(buf + size, &record.skipTimes[0], record.skipTimes.size() * sizeof (t_filetimestamp ));
-			size += record.skipTimes.size() * sizeof t_filetimestamp / sizeof(t_uint);
+			memcpy(buf + size, &record.skipTimes[0], sizeof(t_filetimestamp));
+			size += record.skipTimes.size() * sizeof(t_filetimestamp) / sizeof(int);
 		}
 
 		std::lock_guard<std::mutex> guard(set_record_mutex);
-		theAPI()->set_user_data(index_guid, hash, buf, size * sizeof(t_uint));
+		theAPI()->set_user_data(index_guid, hash, buf, size * sizeof(int));
+		delete[] buf;
 	}
 
 	// Context Menu functions
-	void clearRecords(metadb_handle_list_cref items) {
+	void clearRecord(metadb_handle_list_cref items) {
 		try {
 			if(items.get_count() == 0) {
 				throw pfc::exception_invalid_params();
@@ -284,7 +290,7 @@ namespace foo_skipcount {
 		}
 	}
 
-	void clearTimestamps(metadb_handle_list_cref items) {
+	void clearLastSkip(metadb_handle_list_cref items) {
 		try {
 			if(items.get_count() == 0) {
 				throw pfc::exception_invalid_params();
@@ -297,6 +303,37 @@ namespace foo_skipcount {
 				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
 
 				record_t record = getRecord(hash);
+				record.lastSkip = 0;
+				setRecord(hash, record);
+				tmp += hash;
+			}
+
+			pfc::list_t<metadb_index_hash> hashes;
+			for(auto iter = tmp.first(); iter.is_valid(); iter++) {
+				const metadb_index_hash hash = *iter;
+				hashes += hash;
+			}
+
+			theAPI()->dispatch_refresh(guid_foo_skipcount_index, hashes);
+		} catch(std::exception const& e) {
+			popup_message::g_complain("Could not clear skip information", e);
+		}
+	}
+
+	void clearSkipTimestamp(metadb_handle_list_cref items) {
+		try {
+			if(items.get_count() == 0) {
+				throw pfc::exception_invalid_params();
+			}
+
+			pfc::avltree_t<metadb_index_hash> tmp;
+
+			for(size_t t = 0; t < items.get_count(); t++) {
+				metadb_index_hash hash;
+				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
+
+				record_t record = getRecord(hash);
+				record.skipTimesCounter = 0;
 				record.skipTimes.clear();
 				setRecord(hash, record);
 				tmp += hash;

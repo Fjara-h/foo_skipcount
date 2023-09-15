@@ -26,7 +26,7 @@ namespace foo_skipcount {
 
 	static std::string getSkipTimesStr(std::vector<t_filetimestamp> skipTimes, bool convertTimeStamp, bool jsTimeStamp, bool noArrayChars = false) {
 		std::string str;
-		unsigned int index = 0;
+		size_t index = 0;
 		if(!noArrayChars) {
 			str += "[";
 		}
@@ -57,12 +57,12 @@ namespace foo_skipcount {
 
 	static std::vector<t_filetimestamp> getSkipTimes(metadb_index_hash hash) {
 		record_t record = getRecord(hash);
-		if(record.skipTimes.empty()) {
-			std::vector<t_filetimestamp> skipTimes;
-			return skipTimes;
+		if(!record.skipTimes.empty()) {
+			return record.skipTimes;
 		}
 		else {
-			return record.skipTimes;
+			std::vector<t_filetimestamp> skipTimes;
+			return skipTimes;
 		}
 	}
 
@@ -71,18 +71,23 @@ namespace foo_skipcount {
 		return record.lastSkip;
 	}
 
-	static std::string getSkipCount(metadb_index_hash hash) {
-		record_t record = getRecord(hash);
+	static t_uint getSkipCount(record_t rec) {
 		t_uint count = 0;
 		if(cfg_countNext) {
-			count += record.skipCountNext;
+			count += rec.skipCountNext;
 		}
 		if(cfg_countRandom) {
-			count += record.skipCountRandom;
+			count += rec.skipCountRandom;
 		}
 		if(cfg_countPrevious) {
-			count += record.skipCountPrevious;
+			count += rec.skipCountPrevious;
 		}
+		return count;
+	}
+
+	static std::string getSkipCountStr(metadb_index_hash hash) {
+		record_t record = getRecord(hash);
+		t_uint count = getSkipCount(record);
 		return std::to_string(count);
 	}
 
@@ -117,25 +122,26 @@ namespace foo_skipcount {
 				return false;
 			}
 
-			t_filetimestamp lastSkip;
-			std::vector<t_filetimestamp> skipTimes;
 			switch(index) {
-				case SKIP_COUNT:
-					out->write(titleformat_inputtypes::meta, getSkipCount(hash).c_str());
+				case SKIP_COUNT: {
+					out->write(titleformat_inputtypes::meta, getSkipCountStr(hash).c_str());
 					break;
+				}
 				case LAST_SKIP:
-					lastSkip = getLastSkip(hash);
+				{
+					t_filetimestamp lastSkip = getLastSkip(hash);
 					if(lastSkip > 0) {
 						out->write(titleformat_inputtypes::meta, foobar2000_io::format_filetimestamp(lastSkip));
 					}
 					else {
-						out->write(titleformat_inputtypes::meta, "N/A");
+						out->write(titleformat_inputtypes::meta, "Never");
 					}
 					break;
+				}
 				case SKIP_TIMES_JS:
-				case SKIP_TIMES_RAW:
-					skipTimes = getSkipTimes(hash);
-					if(!skipTimes.size()) {
+				case SKIP_TIMES_RAW: {
+					std::vector<t_filetimestamp> skipTimes = getSkipTimes(hash);
+					if(skipTimes.empty()) {
 						out->write(titleformat_inputtypes::meta, "[]");
 					}
 					else {
@@ -147,12 +153,14 @@ namespace foo_skipcount {
 						}
 					}
 					break;
+				}
 			}
 
 			return true;
 		}
 	};
 
+	// Can I refresh this when cfg_skipFieldPattern is updated
 	static service_factory_single_t<foo_metadb_display_field_provider> g_foo_metadb_display_field_provider;
 
 	static const char strPropertiesGroup[] = "Skip Count Statistics";
@@ -170,52 +178,53 @@ namespace foo_skipcount {
 				}
 			}
 
-			unsigned int skipCount = 0;
-			pfc::string8 lastSkip = "", skipTimes = "";
+			t_uint skipCount = 0;
+			pfc::string8 lastSkipStr = "", skipTimesStr = "";
 			{
-				unsigned int recCount = 0;
+				t_uint recCount = 0;
 				record_t firstRecord;
 				t_filetimestamp lastestSkip = 0;
 				for(auto i = hashes.first(); i.is_valid(); i++) {
 					record_t rec = getRecord(*i);
-					if(recCount == 0) {
+					if(i == hashes.first()) {
 						firstRecord = rec;
 					}
 
-					if(cfg_countNext) {
-						skipCount += rec.skipCountNext;
-					}
-					if(cfg_countRandom) {
-						skipCount += rec.skipCountRandom;
-					}
-					if(cfg_countPrevious) {
-						skipCount += rec.skipCountPrevious;
-					}
+					skipCount += getSkipCount(rec);
+
 					if(rec.lastSkip > lastestSkip) {
 						lastestSkip = rec.lastSkip;
 					}
+
 					recCount++;
 				}
 
-				if(recCount == 1) {
-					skipTimes = getSkipTimesStr(firstRecord.skipTimes, true, false, true).c_str();
+				if(recCount == 1 && firstRecord.skipTimesCounter > 0) {
+					skipTimesStr = getSkipTimesStr(firstRecord.skipTimes, true, false, true).c_str();
 #define MAX_PROPERTY_LENGTH 500
-					if(skipTimes.get_length() > MAX_PROPERTY_LENGTH) {
-						skipTimes.truncate(MAX_PROPERTY_LENGTH);
-						skipTimes += "...";
+					if(skipTimesStr.get_length() > MAX_PROPERTY_LENGTH) {
+						skipTimesStr.truncate(MAX_PROPERTY_LENGTH);
+						skipTimesStr += "...";
 					}
 				}
 				else {
-					skipTimes = "N/A";
+					skipTimesStr = "N/A";
 				}
+
 				if(lastestSkip != 0) {
-					lastSkip = foobar2000_io::format_filetimestamp(lastestSkip);
+					lastSkipStr = foobar2000_io::format_filetimestamp(lastestSkip);
+				}
+				else {
+					lastSkipStr = "Never";
 				}
 			}
 
+			// should I add raw/js here?
 			p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Skipped", PFC_string_formatter() << skipCount << " times");
-			p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimes << " times");
-			p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Last skipped", PFC_string_formatter() << lastSkip);
+			p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Last skipped", PFC_string_formatter() << lastSkipStr);
+			if(skipTimesStr.length() > 0) {
+				p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimesStr << " times");
+			}
 		}
 
 		void enumerate_properties(metadb_handle_list_cref p_tracks, track_property_callback& p_out) {
