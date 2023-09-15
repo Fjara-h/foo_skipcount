@@ -14,21 +14,47 @@ enum {
 };
 
 namespace foo_skipcount {
+
 	// Config
-	extern cfg_bool cfg_countNext, cfg_countRandom, cfg_countPrevious, cfg_countFromPause, cfg_countFromStop;
-	extern cfg_uint cfg_condition, cfg_percent, cfg_time;
+	extern cfg_bool cfg_countNext,
+		cfg_countRandom,
+		cfg_countPrevious,
+		cfg_countFromPause,
+		cfg_countFromStop,
+		cfg_lastSkip,
+		cfg_skipTimes,
+		cfg_skipProtectionPrevious;
+
+	extern cfg_uint cfg_condition,
+		cfg_percent,
+		cfg_time;
+
+	extern cfg_string cfg_skipFieldPattern;
 
 	// Defaults
-	static const bool default_cfg_countNext = true, default_cfg_countRandom = true, default_cfg_countPrevious = false, default_cfg_countFromPause = true, default_cfg_countFromStop = false;
-	static const int default_cfg_condition = 0, default_cfg_percent = 5, default_cfg_time = 5;
+	static const bool default_cfg_countNext = true,
+		default_cfg_countRandom = true,
+		default_cfg_countPrevious = false,
+		default_cfg_countFromPause = true,
+		default_cfg_countFromStop = false,
+		default_cfg_lastSkip = false,
+		default_cfg_skipTimes = false,
+		default_cfg_skipProtectionPrevious = true;
+
+	static const t_uint default_cfg_condition = 0,
+		default_cfg_percent = 5,
+		default_cfg_time = 5;
+
+	static const pfc::string8 default_cfg_skipFieldPattern = "skip_count";
+
 
 #ifdef _WIN32
-	class preferences : public CDialogImpl<preferences>, public preferences_page_instance {
+	class my_preferences : public CDialogImpl<my_preferences>, public preferences_page_instance {
 	public:
 		// Constructor
-		preferences(preferences_page_callback::ptr callback) : m_callback(callback) {}
+		my_preferences(preferences_page_callback::ptr callback) : m_callback(callback) { }
 
-		// No Destructor: Host ensures that this dialog is destroyed first, then the last reference to this preferences_page_instance object is released, causing this object to be deleted.
+		// No Destructor: Host ensures that the dialog is destroyed first then the last reference to this object is released, thus deleted.
 
 		static int const IDD = IDD_PREFERENCES;
 
@@ -46,6 +72,10 @@ namespace foo_skipcount {
 		static GUID guid_cfg_time;
 		static GUID guid_cfg_countFromPause;
 		static GUID guid_cfg_countFromStop;
+		static GUID guid_cfg_lastSkip;
+		static GUID guid_cfg_skipTimes;
+		static GUID guid_cfg_skipFieldPattern;
+		static GUID guid_cfg_skipProtectionPrevious;
 
 		// WTL message map
 		BEGIN_MSG_MAP_EX(preferences)
@@ -58,34 +88,45 @@ namespace foo_skipcount {
 			COMMAND_HANDLER_EX(IDC_TIME, EN_CHANGE, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_PAUSE, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_STOP, BN_CLICKED, OnEditChange)
-		END_MSG_MAP()
+			COMMAND_HANDLER_EX(IDC_LAST_SKIPPED, BN_CLICKED, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_SKIP_TIMES, EN_CHANGE, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_SKIP_FIELD_PATTERN, BN_CLICKED, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_PREVIOUS, BN_CLICKED, OnEditChange)
+			END_MSG_MAP()
 
 	private:
 		BOOL OnInitDialog(CWindow, LPARAM);
-		void preferences::CreateTooltip(CToolTipCtrl, CWindow, int, LPCTSTR, LPCTSTR);
-		void preferences::OnEditChange(UINT, int, CWindow);
-		void preferences::OnSelectionChange(UINT, int, CWindow);
-		bool preferences::HasChanged();
-		void preferences::ConformToBounds(cfg_uint&, unsigned int, unsigned int, unsigned int, unsigned int, int);
-		void preferences::OnChanged();
-		
+		void my_preferences::CreateTooltip(CToolTipCtrl, CWindow, int, LPCTSTR, LPCTSTR);
+		void my_preferences::OnEditChange(UINT, int, CWindow);
+		void my_preferences::OnSelectionChange(UINT, int, CWindow);
+		bool my_preferences::HasChanged();
+		void my_preferences::ConformToBounds(cfg_uint&, t_uint, t_uint, t_uint, t_uint, int);
+		void my_preferences::OnChanged();
+
 		const preferences_page_callback::ptr m_callback;
-		CToolTipCtrl tooltips[8];
+		CToolTipCtrl tooltips[12];
 
 		// Dark mode hooks object, must be a member of dialog class.
 		fb2k::CDarkModeHooks m_dark;
 	};
 
-	class preferences_page_myimpl : public preferences_page_impl<preferences> {
-		// preferences_page_impl<> helper deals with instantiation of our dialog; inherits from preferences_page_v3.
+	// preferences_page_impl<> helper deals with instantiation of dialog window; inherits from preferences_page_v3.
+	class my_preferences_page : public preferences_page_impl<my_preferences> {
+
 	public:
 		const char* get_name() override;
+
 		// {B6F5B09F-4926-449E-A30B-121DF1D7E9E4}
-		GUID get_guid() override { return GUID{ 0xb6f5b09f, 0x4926, 0x449e, { 0xa3, 0x0b, 0x12, 0x1d, 0xf1, 0xd7, 0xe9, 0xe4 } }; }
-		GUID get_parent_guid() override { return guid_tools; }
+		GUID get_guid() override {
+			return GUID{ 0xb6f5b09f, 0x4926, 0x449e, { 0xa3, 0x0b, 0x12, 0x1d, 0xf1, 0xd7, 0xe9, 0xe4 } };
+		}
+
+		GUID get_parent_guid() override {
+			return guid_tools;
+		}
 	};
 
-	static preferences_page_factory_t<preferences_page_myimpl> g_preferences_page_myimpl_factory;
+	static preferences_page_factory_t<my_preferences_page> g_my_preferences_page_factory;
 #endif // _WIN32
 
 }

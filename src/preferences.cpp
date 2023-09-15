@@ -4,8 +4,8 @@
 
 #include <SDK/cfg_var.h>
 #include <pfc/win-objects.cpp>
-#include <string>
 
+#include <string>
 
 namespace foo_skipcount {
 	// GUIDs for settings and their storage within the component's configuration file.
@@ -25,20 +25,33 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_countFromPause = { 0xc2a71eb9, 0xe63d, 0x433b, { 0x84, 0xcf, 0x0b, 0xe3, 0x0d, 0xfd, 0x47, 0xb0 } };
 	// {9C746A7C-24DF-450A-BEBF-F63F14C6BF57}
 	static constexpr GUID guid_cfg_countFromStop = { 0x9c746a7c, 0x24df, 0x450a, { 0xbe, 0xbf, 0xf6, 0x3f, 0x14, 0xc6, 0xbf, 0x57 } };
+	// {800D9D04-CB2E-4D30-9094-522CCF54F5FE}
+	static constexpr GUID guid_cfg_lastSkip = { 0x800d9d04, 0xcb2e, 0x4d30, { 0x90, 0x94, 0x52, 0x2c, 0xcf, 0x54, 0xf5, 0xfe } };
+	// {99F52995-6A9D-48C8-8C10-EFC0DCCA0C09}
+	static constexpr GUID guid_cfg_skipTimes = { 0x99f52995, 0x6a9d, 0x48c8, { 0x8c, 0x10, 0xef, 0xc0, 0xdc, 0xca, 0x0c, 0x09 } };
+	// {FC15F7CD-2DB0-415B-8E8C-3C15366BE028}
+	static constexpr GUID guid_cfg_skipFieldPattern = { 0xfc15f7cd, 0x2db0, 0x415b, { 0x8e, 0x8c, 0x3c, 0x15, 0x36, 0x6b, 0xe0, 0x28 } };
+	// {E958AC28-1626-422F-B0F0-356223DC7EDB}
+	static constexpr GUID guid_cfg_skipProtectionPrevious = { 0xe958ac28, 0x1626, 0x422f, { 0xb0, 0xf0, 0x35, 0x62, 0x23, 0xdc, 0x7e, 0xdb } };
 
 	// Config
 	cfg_bool cfg_countNext(guid_cfg_countNext, default_cfg_countNext),
 		cfg_countRandom(guid_cfg_countRandom, default_cfg_countRandom),
 		cfg_countPrevious(guid_cfg_countPrevious, default_cfg_countPrevious),
 		cfg_countFromPause(guid_cfg_countFromPause, default_cfg_countFromPause),
-		cfg_countFromStop(guid_cfg_countFromStop, default_cfg_countFromStop);
+		cfg_countFromStop(guid_cfg_countFromStop, default_cfg_countFromStop),
+		cfg_skipTimes(guid_cfg_skipTimes, default_cfg_skipTimes),
+		cfg_lastSkip(guid_cfg_lastSkip, default_cfg_lastSkip),
+		cfg_skipProtectionPrevious(guid_cfg_skipProtectionPrevious, default_cfg_skipProtectionPrevious);
 
 	cfg_uint cfg_condition(guid_cfg_condition, default_cfg_condition),
 		cfg_percent(guid_cfg_percent, default_cfg_percent),
 		cfg_time(guid_cfg_time, default_cfg_time);
 
+	cfg_string cfg_skipFieldPattern(guid_cfg_skipFieldPattern, default_cfg_skipFieldPattern);
+
 #ifdef _WIN32
-	BOOL preferences::OnInitDialog(CWindow, LPARAM) {
+	BOOL my_preferences::OnInitDialog(CWindow, LPARAM) {
 		// Enable dark mode
 		m_dark.AddDialogWithControls(*this);
 
@@ -66,6 +79,10 @@ namespace foo_skipcount {
 		SetDlgItemInt(IDC_TIME, (UINT)cfg_time, FALSE);
 		SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_SETCHECK, cfg_countFromPause, NULL);
 		SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_SETCHECK, cfg_countFromStop, NULL);
+		uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, cfg_skipFieldPattern);
+		SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_SETCHECK, cfg_lastSkip, NULL);
+		SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_SETCHECK, cfg_skipTimes, NULL);
+		SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_SETCHECK, cfg_skipProtectionPrevious, NULL);
 
 		CreateTooltip(tooltips[0], m_hWnd, IDC_COUNT_NEXT,
 			L"Add to skip count after pressing next song",
@@ -100,21 +117,40 @@ namespace foo_skipcount {
 			L"Duration of song to count skip",
 			L"\nEnter a number from 0 to 2 billion. After that duration in the song, skips no longer count."
 		);
-		CreateTooltip(tooltips[5], m_hWnd, IDC_COUNT_FROM_PAUSE,
+		CreateTooltip(tooltips[6], m_hWnd, IDC_COUNT_FROM_PAUSE,
 			L"Count a skip after a pause",
 			L"\nWhen enabled and playback is paused, skips coming out of the pause can still count towards "
 			L" the statistic if the conditions are met."
 		);
-		CreateTooltip(tooltips[5], m_hWnd, IDC_COUNT_FROM_STOP,
+		CreateTooltip(tooltips[7], m_hWnd, IDC_COUNT_FROM_STOP,
 			L"Count a skip after a stop",
 			L"\nWhen enabled and the user has stopped playback, skip-actions coming out of stopped playback "
 			L"can still count towards the statistic if the conditions are met."
+		);
+		CreateTooltip(tooltips[8], m_hWnd, IDC_SKIP_FIELD_PATTERN,
+			L"Set the custom column pattern",
+			L"\n The default is skip_count to be used as %skip_count%."
+		);
+		CreateTooltip(tooltips[9], m_hWnd, IDC_LAST_SKIPPED,
+			L"Count a skip after a stop",
+			L"\nWhen enabled, logs the most recent skip date as 'YYYY-MM-DD HH:MM:SS'"
+		);
+		CreateTooltip(tooltips[10], m_hWnd, IDC_SKIP_TIMES,
+			L"Log timestamps of each skip",
+			L"\nWhen enabled, raw and JS timestamps will be logged for each skip, visible with "
+			L"%skip_times_raw% and %skip_times_js%"
+		);
+		CreateTooltip(tooltips[11], m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS,
+			L"Disable skip counting for 1 second after using Previous Song",
+			L"\nWhen enabled, using a control during the condition that would normally count as a skip "
+			L"after pressing Previous Song will not count as a skip. This is for accidental pressing or "
+			L" if checking which song previously played without counting as a real skip."
 		);
 
 		return FALSE;
 	}
 
-	void preferences::CreateTooltip(CToolTipCtrl tooltip, CWindow hWnd, int parent, LPCTSTR title, LPCTSTR body) {
+	void my_preferences::CreateTooltip(CToolTipCtrl tooltip, CWindow hWnd, int parent, LPCTSTR title, LPCTSTR body) {
 		if (tooltip.Create(hWnd, nullptr, nullptr, TTS_NOPREFIX | TTS_BALLOON)) {
 			CToolInfo toolInfo(TTF_IDISHWND | TTF_SUBCLASS | TTF_CENTERTIP,	GetDlgItem(parent), 0, nullptr, nullptr);
 			HICON icon = 0;
@@ -129,23 +165,22 @@ namespace foo_skipcount {
 		}
 	}
 
-
-	void preferences::OnEditChange(UINT, int, CWindow) {
+	void my_preferences::OnEditChange(UINT, int, CWindow) {
 		OnChanged();
 	}
 
-	void preferences::OnSelectionChange(UINT, int, CWindow) {
+	void my_preferences::OnSelectionChange(UINT, int, CWindow) {
 		OnChanged();
 	}
 
-	t_uint32 preferences::get_state() {
+	t_uint32 my_preferences::get_state() {
 		// IMPORTANT: Always return dark_mode_supported
 		t_uint32 state = preferences_state::resettable | preferences_state::dark_mode_supported;
 		if (HasChanged()) state |= preferences_state::changed;
 		return state;
 	}
 
-	void preferences::reset() {
+	void my_preferences::reset() {
 		SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_SETCHECK, default_cfg_countNext, NULL);
 		SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_SETCHECK, default_cfg_countRandom, NULL);
 		SendMessageW(GetDlgItem(IDC_COUNT_PREVIOUS), BM_SETCHECK, default_cfg_countPrevious, NULL);
@@ -154,11 +189,15 @@ namespace foo_skipcount {
 		SetDlgItemInt(IDC_TIME, default_cfg_time, FALSE);
 		SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_SETCHECK, default_cfg_countFromPause, NULL);
 		SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_SETCHECK, default_cfg_countFromStop, NULL);
+		uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, default_cfg_skipFieldPattern);
+		SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_SETCHECK, default_cfg_lastSkip, NULL);
+		SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_SETCHECK, default_cfg_skipTimes, NULL);
+		SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_SETCHECK, default_cfg_skipProtectionPrevious, NULL);
 		OnChanged();
 	}
 
 	// During the applies, check that percent and time are within the correct bounds. 0-100 and 0 - 2000000000
-	void preferences::apply() {
+	void my_preferences::apply() {
 		cfg_countNext = SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
 		cfg_countRandom = SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
 		cfg_countPrevious = SendMessageW(GetDlgItem(IDC_COUNT_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
@@ -169,14 +208,23 @@ namespace foo_skipcount {
 		ConformToBounds(cfg_time, 0, default_cfg_time, 2000000000, 1000, IDC_TIME); // Approx half UINT_MAX
 		cfg_countFromPause = SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
 		cfg_countFromStop = SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
+		pfc::string8_fast text;
+		uGetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, text);
+		if(text.get_length() == 0) {
+			uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, default_cfg_skipFieldPattern);
+		}
+		cfg_skipFieldPattern = text.get_ptr();
+		cfg_lastSkip = SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
+		cfg_skipTimes = SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
+		cfg_skipProtectionPrevious = SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED;
 
-		RefreshGlobal();
+		refreshGlobal();
 		OnChanged(); // Dialog content has not changed but the flags have - shown values now match the settings so the apply button can be disabled
 	}
 
 	// ES_NUMBER only allows valid number characters to be typed or pasted.
 	// This enforces number bounds.
-	void preferences::ConformToBounds(cfg_uint &input, unsigned int min, unsigned int minDefault, unsigned int max, unsigned int maxDefault, int ID) {
+	void my_preferences::ConformToBounds(cfg_uint &input, t_uint min, t_uint minDefault, t_uint max, t_uint maxDefault, int ID) {
 		if(input.get_value() < min) {
 			input = minDefault;
 			SetDlgItemInt(ID, input, FALSE);
@@ -187,7 +235,10 @@ namespace foo_skipcount {
 		}
 	}
 
-	bool preferences::HasChanged() {
+	// Is there a less horrendous way to do this?
+	bool my_preferences::HasChanged() {
+		pfc::string8 tempPattern;
+		uGetDlgItemText(GetDlgItem(IDC_SKIP_FIELD_PATTERN), IDC_SKIP_FIELD_PATTERN, tempPattern);
 		// Returns whether the settings are different from the current configuration - (De)activating the apply button
 		return (SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countNext ||
 			(SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countRandom ||
@@ -195,14 +246,21 @@ namespace foo_skipcount {
 			SendMessageW(GetDlgItem(IDC_CONDITION), CB_GETCURSEL, NULL, NULL) != cfg_condition ||
 			GetDlgItemInt(IDC_PERCENT, NULL, FALSE) != cfg_percent ||
 			GetDlgItemInt(IDC_TIME, NULL, FALSE) != cfg_time ||
-			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromPause || 
-			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromStop;
+			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromPause ||
+			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromStop ||
+			tempPattern != cfg_skipFieldPattern ||
+			(SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_skipTimes ||
+			(SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_lastSkip ||
+			(SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_skipProtectionPrevious;
 	}
-	void preferences::OnChanged() {
+
+	void my_preferences::OnChanged() {
 		// Update state to 'changed' to enable/disable the apply button appropriately.
 		m_callback->on_state_changed();
 	}
 
-	const char* preferences_page_myimpl::get_name() { return "Skip Count"; }
+	const char* my_preferences_page::get_name() {
+		return "Skip Count";
+	}
 #endif // _WIN32
 }
