@@ -13,8 +13,7 @@
 #define IDC_COUNT_FROM_STOP             1008
 #define IDC_LAST_SKIPPED                1009
 #define IDC_SKIP_TIMES                  1010
-#define IDC_SKIP_FIELD_PATTERN          1011
-#define IDC_SKIP_PROTECTION_PREVIOUS    1012
+#define IDC_SKIP_PROTECTION_PREVIOUS    1011
 
 // Next default values for new objects
 // 

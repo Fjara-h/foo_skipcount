@@ -29,8 +29,6 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_lastSkip = { 0x800d9d04, 0xcb2e, 0x4d30, { 0x90, 0x94, 0x52, 0x2c, 0xcf, 0x54, 0xf5, 0xfe } };
 	// {99F52995-6A9D-48C8-8C10-EFC0DCCA0C09}
 	static constexpr GUID guid_cfg_skipTimes = { 0x99f52995, 0x6a9d, 0x48c8, { 0x8c, 0x10, 0xef, 0xc0, 0xdc, 0xca, 0x0c, 0x09 } };
-	// {FC15F7CD-2DB0-415B-8E8C-3C15366BE028}
-	static constexpr GUID guid_cfg_skipFieldPattern = { 0xfc15f7cd, 0x2db0, 0x415b, { 0x8e, 0x8c, 0x3c, 0x15, 0x36, 0x6b, 0xe0, 0x28 } };
 	// {E958AC28-1626-422F-B0F0-356223DC7EDB}
 	static constexpr GUID guid_cfg_skipProtectionPrevious = { 0xe958ac28, 0x1626, 0x422f, { 0xb0, 0xf0, 0x35, 0x62, 0x23, 0xdc, 0x7e, 0xdb } };
 
@@ -47,8 +45,6 @@ namespace foo_skipcount {
 	cfg_uint cfg_condition(guid_cfg_condition, default_cfg_condition),
 		cfg_percent(guid_cfg_percent, default_cfg_percent),
 		cfg_time(guid_cfg_time, default_cfg_time);
-
-	cfg_string cfg_skipFieldPattern(guid_cfg_skipFieldPattern, default_cfg_skipFieldPattern);
 
 #ifdef _WIN32
 	BOOL my_preferences::OnInitDialog(CWindow, LPARAM) {
@@ -71,7 +67,6 @@ namespace foo_skipcount {
 		SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_SETCHECK, cfg_countFromStop);
 		SendDlgItemMessage(IDC_LAST_SKIPPED, BM_SETCHECK, cfg_lastSkip);
 		SendDlgItemMessage(IDC_SKIP_TIMES, BM_SETCHECK, cfg_skipTimes);
-		uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, cfg_skipFieldPattern);
 		SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_SETCHECK, cfg_skipProtectionPrevious);
 
 		CreateTooltip(tooltips[0], m_hWnd, IDC_COUNT_NEXT,
@@ -116,10 +111,6 @@ namespace foo_skipcount {
 			L"Count a skip after a stop",
 			L"\nWhen enabled and the user has stopped playback, skip-actions coming out of stopped playback "
 			L"can still count towards the statistic if the conditions are met."
-		);
-		CreateTooltip(tooltips[8], m_hWnd, IDC_SKIP_FIELD_PATTERN,
-			L"Set the custom column pattern",
-			L"\n The default is skip_count to be used as %skip_count%."
 		);
 		CreateTooltip(tooltips[9], m_hWnd, IDC_LAST_SKIPPED,
 			L"Count a skip after a stop",
@@ -181,12 +172,12 @@ namespace foo_skipcount {
 		SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_SETCHECK, default_cfg_countFromStop);
 		SendDlgItemMessage(IDC_LAST_SKIPPED, BM_SETCHECK, default_cfg_lastSkip);
 		SendDlgItemMessage(IDC_SKIP_TIMES, BM_SETCHECK, default_cfg_skipTimes);
-		uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, default_cfg_skipFieldPattern);
 		SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_SETCHECK, default_cfg_skipProtectionPrevious);
 		OnChanged();
 	}
 
 	void my_preferences::apply() {
+		
 		cfg_countNext = (t_int32)SendDlgItemMessage(IDC_COUNT_NEXT, BM_GETCHECK);
 		cfg_countRandom = (t_int32)SendDlgItemMessage(IDC_COUNT_RANDOM, BM_GETCHECK);
 		cfg_countPrevious = (t_int32)SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_GETCHECK);
@@ -197,12 +188,6 @@ namespace foo_skipcount {
 		cfg_countFromStop = (t_int32)SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_GETCHECK);
 		cfg_lastSkip = (t_int32)SendDlgItemMessage(IDC_LAST_SKIPPED, BM_GETCHECK);
 		cfg_skipTimes = (t_int32)SendDlgItemMessage(IDC_LAST_SKIPPED, BM_GETCHECK);
-		pfc::string8_fast text;
-		uGetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, text);
-		if(text.get_length() == 0) {
-			uSetDlgItemText(m_hWnd, IDC_SKIP_FIELD_PATTERN, default_cfg_skipFieldPattern);
-		}
-		cfg_skipFieldPattern = text.get_ptr();
 		cfg_skipProtectionPrevious = (t_int32)SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_GETCHECK);
 
 		refreshGlobal();
@@ -228,12 +213,7 @@ namespace foo_skipcount {
 
 	// Is there a less horrendous way to do this?
 	bool my_preferences::HasChanged() {
-		pfc::string8 _skipFieldPattern;
-		uGetDlgItemText(GetDlgItem(IDC_SKIP_FIELD_PATTERN), IDC_SKIP_FIELD_PATTERN, _skipFieldPattern);
-		if(_skipFieldPattern != cfg_skipFieldPattern) {
-			return true;
-		}
-				
+	
 		// Returns whether the settings are different from the current configuration - (De)activating the apply button
 		return (SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countNext ||
 			(SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countRandom ||

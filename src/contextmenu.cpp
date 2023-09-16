@@ -53,7 +53,7 @@ namespace foo_skipcount {
 		void context_command(unsigned int p_index, metadb_handle_list_cref p_data, const GUID& p_caller) {
 			switch(p_index) {
 				case cmd_clear_skipcount:
-					clearRecord(p_data);
+					clearSkipCount(p_data);
 					break;
 				case cmd_clear_lastskip:
 					clearLastSkip(p_data);
@@ -96,12 +96,15 @@ namespace foo_skipcount {
 				case cmd_clear_skipcount:
 					p_out = "Clears all recorded skips for selected tracks.";
 					return true;
+					break;
 				case cmd_clear_lastskip:
 					p_out = "Clears all last skip timestamps for selected tracks.";
 					return true;
+					break;
 				case cmd_clear_skiptimes:
 					p_out = "Clears all skip timestamps on selected tracks.";
 					return true;
+					break;
 				default:
 					uBugCheck(); // Failsafe
 			}

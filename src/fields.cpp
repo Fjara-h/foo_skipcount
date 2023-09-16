@@ -91,7 +91,7 @@ namespace foo_skipcount {
 		return std::to_string(count);
 	}
 
-	class foo_metadb_display_field_provider : public metadb_display_field_provider {
+	class my_metadb_display_field_provider : public metadb_display_field_provider {
 	public:
 		t_uint32 get_field_count() {
 			return MAX_NUM_FIELDS;
@@ -100,7 +100,7 @@ namespace foo_skipcount {
 			PFC_ASSERT(index >= 0 && index < MAX_NUM_FIELDS);
 			switch(index) {
 				case SKIP_COUNT:
-					out = cfg_skipFieldPattern;
+					out = "skip_count";
 					break;
 				case LAST_SKIP:
 					out = "last_skip";
@@ -160,13 +160,12 @@ namespace foo_skipcount {
 		}
 	};
 
-	// Can I refresh this when cfg_skipFieldPattern is updated
-	static service_factory_single_t<foo_metadb_display_field_provider> g_foo_metadb_display_field_provider;
+	static service_factory_single_t<my_metadb_display_field_provider> g_my_metadb_display_field_provider;
 
 	static const char strPropertiesGroup[] = "Skip Count Statistics";
 
 	// This class provides config information for the properties dialog
-	class foo_track_property_provider : public track_property_provider_v2 {
+	class my_track_property_provider : public track_property_provider_v2 {
 	public:
 		void workThisIndex(GUID const& whichID, double priorityBase, metadb_handle_list_cref p_tracks, track_property_callback& p_out) {
 			auto client = clientByGUID(whichID);
@@ -243,5 +242,5 @@ namespace foo_skipcount {
 		}
 	};
 
-	static service_factory_single_t<foo_track_property_provider> g_foo_track_property_provider;
+	static service_factory_single_t<my_track_property_provider> g_my_track_property_provider;
 }

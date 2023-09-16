@@ -72,9 +72,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,29,113,8
     CONTROL         "Log last date skipped",IDC_LAST_SKIPPED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,96,82,9
     CONTROL         "Log skip times",IDC_SKIP_TIMES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,108,63,8
-    LTEXT           "Field pattern: %",IDC_STATIC,26,121,50,8
-    CTEXT           "%",IDC_STATIC,131,121,8,8
-    EDITTEXT        IDC_SKIP_FIELD_PATTERN,77,119,54,12,ES_AUTOHSCROLL
     CONTROL         "Skip Protection: Disable counting increments for 1s after using Previous",IDC_SKIP_PROTECTION_PREVIOUS,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,16,134,246,8
 END

@@ -29,8 +29,6 @@ namespace foo_skipcount {
 		cfg_percent,
 		cfg_time;
 
-	extern cfg_string cfg_skipFieldPattern;
-
 	// Defaults
 	static const bool default_cfg_countNext = true,
 		default_cfg_countRandom = true,
@@ -44,8 +42,6 @@ namespace foo_skipcount {
 	static const t_uint default_cfg_condition = 0,
 		default_cfg_percent = 5,
 		default_cfg_time = 5;
-
-	static const pfc::string8 default_cfg_skipFieldPattern = "skip_count";
 
 
 #ifdef _WIN32
@@ -74,7 +70,6 @@ namespace foo_skipcount {
 		static GUID guid_cfg_countFromStop;
 		static GUID guid_cfg_lastSkip;
 		static GUID guid_cfg_skipTimes;
-		static GUID guid_cfg_skipFieldPattern;
 		static GUID guid_cfg_skipProtectionPrevious;
 
 		// WTL message map
@@ -90,9 +85,8 @@ namespace foo_skipcount {
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_STOP, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_LAST_SKIPPED, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_SKIP_TIMES, EN_CHANGE, OnEditChange)
-			COMMAND_HANDLER_EX(IDC_SKIP_FIELD_PATTERN, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_PREVIOUS, BN_CLICKED, OnEditChange)
-			END_MSG_MAP()
+		END_MSG_MAP()
 
 	private:
 		BOOL OnInitDialog(CWindow, LPARAM);

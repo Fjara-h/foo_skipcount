@@ -197,7 +197,7 @@ namespace foo_skipcount {
 
 	static service_factory_single_t<my_play_callback> g_my_play_callback;
 
-	void copyTimestampsToVector(std::vector<t_filetimestamp>& dest, t_filetimestamp* src, unsigned int elementCount) {
+	void copyTimestampsToVector(std::vector<t_filetimestamp>& dest, unsigned int* src, unsigned int elementCount) {
 		dest.insert(dest.begin(), src, src + elementCount);
 	}
 
@@ -207,7 +207,7 @@ namespace foo_skipcount {
 		record_t record;
 		size_t size = 0;
 		size = theAPI()->get_user_data_here(index_guid, hash, &buf, sizeof(buf));
-		if(!size) {
+		if(size == 0) {
 			return record;
 		}
 		
@@ -223,15 +223,16 @@ namespace foo_skipcount {
 			record.skipCountRandom = buf[2];
 			record.skipCountPrevious = buf[3];
 			record.skipTimesCounter = buf[4];
-			memcpy(&record.lastSkip, (t_filetimestamp*)&buf[5], sizeof(t_filetimestamp));
+			memcpy(&record.lastSkip, &buf[5], sizeof(t_filetimestamp));
 			if(record.skipTimesCounter > 0) {
-				copyTimestampsToVector(record.skipTimes, (t_filetimestamp*)&buf[6], record.skipTimesCounter);
+				//memcpy(&record.skipTimes, &buf[5], record.skipTimesCounter * sizeof(t_filetimestamp))
+				record.skipTimes.insert(record.skipTimes.begin(), buf[5] + sizeof(t_filetimestamp)/sizeof(int), buf[5] + sizeof(t_filetimestamp) / sizeof(int) + record.skipTimesCounter);
+				//copyTimestampsToVector(record.skipTimes, &buf[5] + (*t_filetimestamp), record.skipTimesCounter);
 			}
 		}
 		return record;
 	}
 
-	// check memory accessor positions
 	std::mutex set_record_mutex;
 	static void setRecord(metadb_index_hash hash, record_t record, const GUID index_guid) {
 		unsigned int* buf = new unsigned int[10006];
@@ -243,12 +244,12 @@ namespace foo_skipcount {
 		size_t size = 5;
 
 		// Copy lastSkip timestamp
-		memcpy(&buf[5], &record.lastSkip, sizeof(t_filetimestamp));
+		memcpy(buf + size, &record.lastSkip, sizeof(t_filetimestamp));
 
 		size += sizeof(t_filetimestamp) / sizeof(int);
 		// Copy over the vector of skip timestamps
 		if(record.skipTimesCounter > 0) {
-			memcpy(buf + size, &record.skipTimes[0], sizeof(t_filetimestamp));
+			memcpy(buf + size, &record.skipTimes[0], record.skipTimes.size() * sizeof(t_filetimestamp));
 			size += record.skipTimes.size() * sizeof(t_filetimestamp) / sizeof(int);
 		}
 
@@ -258,7 +259,7 @@ namespace foo_skipcount {
 	}
 
 	// Context Menu functions
-	void clearRecord(metadb_handle_list_cref items) {
+	void clearSkipCount(metadb_handle_list_cref items) {
 		try {
 			if(items.get_count() == 0) {
 				throw pfc::exception_invalid_params();
