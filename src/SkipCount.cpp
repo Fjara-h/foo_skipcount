@@ -1,8 +1,10 @@
 #include "stdafx.h"
-#include "preferences.h"
 #include "SkipCount.h"
+
 #include <mutex>
 #include <vector>
+
+#include "preferences.h"
 
 using namespace pfc;
 
@@ -90,8 +92,8 @@ namespace foo_skipcount {
 		}
 		if(didIncrement) {
 			t_filetimestamp time = filetimestamp_from_system_timer();
-			if(cfg_lastSkip) {
-				record.lastSkip = time;
+			if(cfg_lastSkip && !cfg_skipTimes && !record.skipTimes.empty()) {
+					record.skipTimes.back() = time;
 			}
 			if(cfg_skipTimes) {
 				record.skipTimesCounter++;
@@ -197,7 +199,7 @@ namespace foo_skipcount {
 
 	static service_factory_single_t<my_play_callback> g_my_play_callback;
 
-	void copyTimestampsToVector(std::vector<t_filetimestamp>& dest, unsigned int* src, unsigned int elementCount) {
+	void copyTimestampsToVector(std::vector<t_filetimestamp>& dest, t_filetimestamp* src, const size_t elementCount) {
 		dest.insert(dest.begin(), src, src + elementCount);
 	}
 
@@ -223,11 +225,8 @@ namespace foo_skipcount {
 			record.skipCountRandom = buf[2];
 			record.skipCountPrevious = buf[3];
 			record.skipTimesCounter = buf[4];
-			memcpy(&record.lastSkip, &buf[5], sizeof(t_filetimestamp));
 			if(record.skipTimesCounter > 0) {
-				//memcpy(&record.skipTimes, &buf[5], record.skipTimesCounter * sizeof(t_filetimestamp))
-				record.skipTimes.insert(record.skipTimes.begin(), buf[5] + sizeof(t_filetimestamp)/sizeof(int), buf[5] + sizeof(t_filetimestamp) / sizeof(int) + record.skipTimesCounter);
-				//copyTimestampsToVector(record.skipTimes, &buf[5] + (*t_filetimestamp), record.skipTimesCounter);
+				copyTimestampsToVector(record.skipTimes, (t_filetimestamp*)&buf[5], record.skipTimesCounter);
 			}
 		}
 		return record;
@@ -243,12 +242,8 @@ namespace foo_skipcount {
 		memcpy(buf, &record, 5 * sizeof(int));
 		size_t size = 5;
 
-		// Copy lastSkip timestamp
-		memcpy(buf + size, &record.lastSkip, sizeof(t_filetimestamp));
-
-		size += sizeof(t_filetimestamp) / sizeof(int);
 		// Copy over the vector of skip timestamps
-		if(record.skipTimesCounter > 0) {
+		if(!record.skipTimes.empty()) {
 			memcpy(buf + size, &record.skipTimes[0], record.skipTimes.size() * sizeof(t_filetimestamp));
 			size += record.skipTimes.size() * sizeof(t_filetimestamp) / sizeof(int);
 		}
@@ -304,8 +299,11 @@ namespace foo_skipcount {
 				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
 
 				record_t record = getRecord(hash);
-				record.lastSkip = 0;
-				setRecord(hash, record);
+				if(!record.skipTimes.empty()) {
+					record.skipTimes.pop_back();
+					record.skipTimesCounter--;
+					setRecord(hash, record);
+				}
 				tmp += hash;
 			}
 
@@ -401,4 +399,4 @@ namespace foo_skipcount {
 		PFC_ASSERT(guid == guid_foo_skipcount_index);
 		return g_clientIndex;
 	}
-}
+} // namespace foo_skipcount

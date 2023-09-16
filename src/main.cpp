@@ -12,3 +12,6 @@ DECLARE_COMPONENT_VERSION("Skip count", COMPONENT_VERSION, "Track skip statistic
 
 // This will prevent users from renaming your component around (important for proper troubleshooter behaviors) or loading multiple instances of it.
 VALIDATE_COMPONENT_FILENAME("foo_skipcount.dll");
+
+// https://hydrogenaud.io/index.php/topic,124741.0.html
+// https://hydrogenaud.io/index.php/topic,124742.0.html

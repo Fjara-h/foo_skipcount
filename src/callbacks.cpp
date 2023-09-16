@@ -34,4 +34,4 @@ namespace foo_skipcount {
 	FB2K_SERVICE_FACTORY(my_library_callback);
 	FB2K_SERVICE_FACTORY(my_initquit);
 	FB2K_SERVICE_FACTORY(my_init_stage_callback);
-}
+} // namespace foo_skipcount

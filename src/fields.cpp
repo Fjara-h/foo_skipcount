@@ -1,9 +1,9 @@
+#include <string>
+
 #include "preferences.h"
 #include "SkipCount.h"
 
 #include <helpers/filetimetools.h>
-
-#include <string>
 
 namespace foo_skipcount {
 
@@ -68,7 +68,13 @@ namespace foo_skipcount {
 
 	static t_filetimestamp getLastSkip(metadb_index_hash hash) {
 		record_t record = getRecord(hash);
-		return record.lastSkip;
+		if(!record.skipTimes.empty()) {
+			return record.skipTimes.back();
+		}
+		else {
+			t_filetimestamp lastSkip = 0;
+			return lastSkip;
+		}
 	}
 
 	static t_uint getSkipCount(record_t rec) {
@@ -178,7 +184,7 @@ namespace foo_skipcount {
 			}
 
 			t_uint skipCount = 0;
-			pfc::string8 lastSkipStr = "", skipTimesStr = "";
+			pfc::string8 lastSkipStr = "", skipTimesStr = "", skipTimesRawStr = "", skipTimesJSStr = "";
 			{
 				t_uint recCount = 0;
 				record_t firstRecord;
@@ -191,10 +197,6 @@ namespace foo_skipcount {
 
 					skipCount += getSkipCount(rec);
 
-					if(rec.lastSkip > lastestSkip) {
-						lastestSkip = rec.lastSkip;
-					}
-
 					recCount++;
 				}
 
@@ -205,24 +207,28 @@ namespace foo_skipcount {
 						skipTimesStr.truncate(MAX_PROPERTY_LENGTH);
 						skipTimesStr += "...";
 					}
+					skipTimesRawStr = getSkipTimesStr(firstRecord.skipTimes, false, false, true).c_str();
+					if(skipTimesRawStr.get_length() > MAX_PROPERTY_LENGTH) {
+						skipTimesRawStr.truncate(MAX_PROPERTY_LENGTH);
+						skipTimesRawStr += "...";
+					}
+					skipTimesJSStr = getSkipTimesStr(firstRecord.skipTimes, false, true, true).c_str();
+					if(skipTimesJSStr.get_length() > MAX_PROPERTY_LENGTH) {
+						skipTimesJSStr.truncate(MAX_PROPERTY_LENGTH);
+						skipTimesJSStr += "...";
+					}
 				}
 				else {
 					skipTimesStr = "N/A";
-				}
-
-				if(lastestSkip != 0) {
-					lastSkipStr = foobar2000_io::format_filetimestamp(lastestSkip);
-				}
-				else {
-					lastSkipStr = "Never";
 				}
 			}
 
 			// should I add raw/js here?
 			p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Skipped", PFC_string_formatter() << skipCount << " times");
-			p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Last skipped", PFC_string_formatter() << lastSkipStr);
 			if(skipTimesStr.length() > 0) {
-				p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimesStr << " times");
+				p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimesStr);
+				p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Skip times raw", PFC_string_formatter() << skipTimesRawStr);
+				p_out.set_property(strPropertiesGroup, priorityBase + 3, PFC_string_formatter() << "Skip times JS", PFC_string_formatter() << skipTimesJSStr);
 			}
 		}
 
@@ -243,4 +249,4 @@ namespace foo_skipcount {
 	};
 
 	static service_factory_single_t<my_track_property_provider> g_my_track_property_provider;
-}
+} // namespace foo_skipcount

@@ -98,7 +98,7 @@ namespace foo_skipcount {
 					return true;
 					break;
 				case cmd_clear_lastskip:
-					p_out = "Clears all last skip timestamps for selected tracks.";
+					p_out = "Clears most recent skip timestamp for selected tracks.";
 					return true;
 					break;
 				case cmd_clear_skiptimes:
@@ -112,4 +112,4 @@ namespace foo_skipcount {
 	};
 
 	static contextmenu_item_factory_t<my_item> g_my_item_factory;
-}
+} // namespace foo_skipcount

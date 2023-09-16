@@ -123,4 +123,4 @@ namespace foo_skipcount {
 	static preferences_page_factory_t<my_preferences_page> g_my_preferences_page_factory;
 #endif // _WIN32
 
-}
+} // namespace foo_skipcount

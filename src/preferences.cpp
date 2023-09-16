@@ -1,11 +1,12 @@
 #include "preferences.h"
-#include "globals.h"
-#include "SkipCount.h"
+
+#include <string>
 
 #include <SDK/cfg_var.h>
 #include <pfc/win-objects.cpp>
 
-#include <string>
+#include "globals.h"
+#include "SkipCount.h"
 
 namespace foo_skipcount {
 	// GUIDs for settings and their storage within the component's configuration file.
@@ -237,4 +238,4 @@ namespace foo_skipcount {
 		return "Skip Count";
 	}
 #endif // _WIN32
-}
+} // namespace foo_skipcount

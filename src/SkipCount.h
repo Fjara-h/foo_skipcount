@@ -1,4 +1,5 @@
 #pragma once
+
 #include "globals.h"
 
 namespace foo_skipcount {
@@ -17,7 +18,6 @@ namespace foo_skipcount {
 		unsigned int skipCountRandom = 0;
 		unsigned int skipCountPrevious = 0;
 		unsigned int skipTimesCounter = 0;
-		t_filetimestamp lastSkip = 0;
 		std::vector<t_filetimestamp> skipTimes;
 	};
 
@@ -45,4 +45,4 @@ namespace foo_skipcount {
 	};
 
 	service_ptr_t<my_metadb_index_client> clientByGUID(const GUID&);
-}
+} // namespace foo_skipcount
