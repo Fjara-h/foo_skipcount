@@ -115,12 +115,12 @@ namespace foo_skipcount {
 		);
 		CreateTooltip(tooltips[9], m_hWnd, IDC_LAST_SKIPPED,
 			L"Count a skip after a stop",
-			L"\nWhen enabled, logs the most recent skip date as 'YYYY-MM-DD HH:MM:SS'"
+			L"\nWhen enabled, logs the most recent skip date as 'YYYY-MM-DD HH:MM:SS' visible with %last_skip%"
 		);
 		CreateTooltip(tooltips[10], m_hWnd, IDC_SKIP_TIMES,
 			L"Log timestamps of each skip",
 			L"\nWhen enabled, raw and JS timestamps will be logged for each skip, visible with "
-			L"%skip_times_raw% and %skip_times_js%"
+			L"%skip_times_raw% and %skip_times_js%. This effectively over-rides the 'Log last date skipped' to be true."
 		);
 		CreateTooltip(tooltips[11], m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS,
 			L"Disable skip counting for 1 second after using Previous Song",
