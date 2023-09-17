@@ -34,13 +34,14 @@ namespace foo_skipcount {
 					p_out = "Clear saved skip count";
 					break;
 				case cmd_clear_lastskip:
-					p_out = "Clear last skip timestamp";
+					p_out = "Clear most recent skip timestamp";
 					break;
 				case cmd_clear_skiptimes:
 					p_out = "Clear skip timestamps";
 					break;
 				default:
 					uBugCheck(); // Failsafe
+					break;
 			}
 		}
 
@@ -63,6 +64,7 @@ namespace foo_skipcount {
 					break;
 				default:
 					uBugCheck();
+					break;
 			}
 		}
 
@@ -87,8 +89,8 @@ namespace foo_skipcount {
 					break;
 				default:
 					uBugCheck(); // Failsafe
+					break;
 			}
-
 		}
 
 		bool get_item_description(unsigned p_index, pfc::string_base& p_out) {
@@ -107,6 +109,7 @@ namespace foo_skipcount {
 					break;
 				default:
 					uBugCheck(); // Failsafe
+					break;
 			}
 		}
 	};

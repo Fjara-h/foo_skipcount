@@ -62,6 +62,7 @@ namespace foo_skipcount {
 					record_t oldRecord = getRecord(hashOld);
 					if(oldRecord.skipCountNext > 0 || oldRecord.skipCountRandom > 0 || oldRecord.skipCountPrevious > 0) {
 						record_t newRecord = getRecord(hashNew);
+						//should i care about skipTimes?
 						if(newRecord.skipCountNext + newRecord.skipCountPrevious + newRecord.skipCountRandom <= oldRecord.skipCountNext + oldRecord.skipCountRandom + oldRecord.skipCountPrevious) {
 							setRecord(hashNew, oldRecord);
 						}
@@ -203,9 +204,8 @@ namespace foo_skipcount {
 		dest.insert(dest.begin(), src, src + elementCount);
 	}
 
-	//this is crashing
 	record_t getRecord(metadb_index_hash hash, const GUID index_guid) {
-		unsigned int buf[10004];
+		unsigned int buf[10005];
 		record_t record;
 		size_t size = 0;
 		size = theAPI()->get_user_data_here(index_guid, hash, &buf, sizeof(buf));
@@ -332,6 +332,7 @@ namespace foo_skipcount {
 				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
 
 				record_t record = getRecord(hash);
+				// Potential conditional placement to avoid a set operation
 				record.skipTimesCounter = 0;
 				record.skipTimes.clear();
 				setRecord(hash, record);

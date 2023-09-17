@@ -93,8 +93,7 @@ namespace foo_skipcount {
 
 	static std::string getSkipCountStr(metadb_index_hash hash) {
 		record_t record = getRecord(hash);
-		t_uint count = getSkipCount(record);
-		return std::to_string(count);
+		return std::to_string(getSkipCount(record));
 	}
 
 	class my_metadb_display_field_provider : public metadb_display_field_provider {
@@ -183,12 +182,12 @@ namespace foo_skipcount {
 				}
 			}
 
-			t_uint skipCount = 0;
-			pfc::string8 lastSkipStr = "", skipTimesStr = "", skipTimesRawStr = "", skipTimesJSStr = "";
+			t_uint skipCount = 0, nextCount = 0, randomCount = 0, previousCount = 0;
+			pfc::string8 skipTimesStr = "", skipTimesRawStr = "", skipTimesJSStr = "";
+			t_filetimestamp latestSkip = 0;
 			{
 				t_uint recCount = 0;
 				record_t firstRecord;
-				t_filetimestamp lastestSkip = 0;
 				for(auto i = hashes.first(); i.is_valid(); i++) {
 					record_t rec = getRecord(*i);
 					if(i == hashes.first()) {
@@ -196,7 +195,13 @@ namespace foo_skipcount {
 					}
 
 					skipCount += getSkipCount(rec);
-
+					nextCount += rec.skipCountNext;
+					randomCount += rec.skipCountRandom;
+					previousCount += rec.skipCountPrevious;
+					if(!rec.skipTimes.empty() && latestSkip < rec.skipTimes.back()) {
+						latestSkip = rec.skipTimes.back();
+					}
+					
 					recCount++;
 				}
 
@@ -223,9 +228,12 @@ namespace foo_skipcount {
 				}
 			}
 
-			// should I add raw/js here?
 			p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Skipped", PFC_string_formatter() << skipCount << " times");
+			p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Next skipped", PFC_string_formatter() << nextCount << " times");
+			p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Random skipped", PFC_string_formatter() << randomCount << " times");
+			p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Previous skipped", PFC_string_formatter() << previousCount << " times");
 			if(skipTimesStr.length() > 0) {
+				p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Last skip", PFC_string_formatter() << foobar2000_io::format_filetimestamp(latestSkip));
 				p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimesStr);
 				p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Skip times raw", PFC_string_formatter() << skipTimesRawStr);
 				p_out.set_property(strPropertiesGroup, priorityBase + 3, PFC_string_formatter() << "Skip times JS", PFC_string_formatter() << skipTimesJSStr);

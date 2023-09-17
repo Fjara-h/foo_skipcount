@@ -120,8 +120,8 @@
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetPath)" "D:\Source\foobar2000_portable\user-components\$(ProjectName)\"
-copy /Y "$(TargetPath)" "D:\Source\foobar2000-2.0_portable\profile\user-components\$(ProjectName)\"</Command>
+      <Command>copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 (x86)\profile\user-components\$(ProjectName)\"
+copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 V1.6\profile\user-components\$(ProjectName)\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying to components directory</Message>
@@ -157,7 +157,7 @@ copy /Y "$(TargetPath)" "D:\Source\foobar2000-2.0_portable\profile\user-componen
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetPath)" "D:\Source\foobar2000-2.0x64_portable\profile\user-components-x64\$(ProjectName)\"</Command>
+      <Command>copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 (x64)\profile\user-components\$(ProjectName)\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying to components directory</Message>
