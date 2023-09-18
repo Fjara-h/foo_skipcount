@@ -29,6 +29,7 @@ namespace foo_skipcount {
 
 	void clearSkipCount(metadb_handle_list_cref);
 	void clearLastSkip(metadb_handle_list_cref);
+	void clearAllButRecentSkip(metadb_handle_list_cref);
 	void clearSkipTimestamp(metadb_handle_list_cref);
 
 	metadb_index_manager::ptr theAPI();

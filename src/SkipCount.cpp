@@ -319,6 +319,40 @@ namespace foo_skipcount {
 		}
 	}
 
+	void clearAllButRecentSkip(metadb_handle_list_cref items) {
+		try {
+			if(items.get_count() == 0) {
+				throw pfc::exception_invalid_params();
+			}
+
+			pfc::avltree_t<metadb_index_hash> tmp;
+
+			for(size_t t = 0; t < items.get_count(); t++) {
+				metadb_index_hash hash;
+				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
+
+				record_t record = getRecord(hash);
+				if(record.skipTimes.size() > 1) { 
+					t_filetimestamp recent = record.skipTimes.back();
+					record.skipTimes.clear();
+					record.skipTimes.push_back(recent);
+					record.skipTimesCounter = 1;
+					setRecord(hash, record);
+				}
+			}
+
+			pfc::list_t<metadb_index_hash> hashes;
+			for(auto iter = tmp.first(); iter.is_valid(); iter++) {
+				const metadb_index_hash hash = *iter;
+				hashes += hash;
+			}
+
+			theAPI()->dispatch_refresh(guid_foo_skipcount_index, hashes);
+		} catch(std::exception const& e) {
+			popup_message::g_complain("Could not clear skip information", e);
+		}
+	}
+
 	void clearSkipTimestamp(metadb_handle_list_cref items) {
 		try {
 			if(items.get_count() == 0) {

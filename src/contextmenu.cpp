@@ -16,7 +16,8 @@ namespace foo_skipcount {
 		enum {
 			cmd_clear_skipcount = 0,
 			cmd_clear_lastskip = 1,
-			cmd_clear_skiptimes = 2,
+			cmd_clear_allbutlastskip = 2,
+			cmd_clear_skiptimes = 3,
 			cmd_total
 		};
 
@@ -35,6 +36,9 @@ namespace foo_skipcount {
 					break;
 				case cmd_clear_lastskip:
 					p_out = "Clear most recent skip timestamp";
+					break;
+				case cmd_clear_allbutlastskip:
+					p_out = "Clear all but most recent skip timstamp";
 					break;
 				case cmd_clear_skiptimes:
 					p_out = "Clear skip timestamps";
@@ -59,6 +63,9 @@ namespace foo_skipcount {
 				case cmd_clear_lastskip:
 					clearLastSkip(p_data);
 					break;
+				case cmd_clear_allbutlastskip:
+					clearAllButRecentSkip(p_data);
+					break;
 				case cmd_clear_skiptimes:
 					clearSkipTimestamp(p_data);
 					break;
@@ -74,6 +81,8 @@ namespace foo_skipcount {
 			static const GUID guid_clear_skipcount = { 0x204b4cb0, 0xc0ba, 0x4732, { 0x88, 0x26, 0x88, 0x8e, 0xa7, 0xcd, 0x3c, 0xe8 } };
 			// {829B7BEF-3DA3-42F8-883F-C3C32E78D980}
 			static const GUID guid_clear_lastskip = { 0x829b7bef, 0x3da3, 0x42f8, { 0x88, 0x3f, 0xc3, 0xc3, 0x2e, 0x78, 0xd9, 0x80 } };
+			// {4FEFE5E1-C64C-45E2-B0A5-2F9B5084CE4D}
+			static const GUID guid_clear_allbutlastskip = { 0x4fefe5e1, 0xc64c, 0x45e2, { 0xb0, 0xa5, 0x2f, 0x9b, 0x50, 0x84, 0xce, 0x4d } };
 			// {485F7FE9-43F8-4D35-AE41-4CA98377E1CF}
 			static const GUID guid_clear_skiptimes = { 0x485f7fe9, 0x43f8, 0x4d35, { 0xae, 0x41, 0x4c, 0xa9, 0x83, 0x77, 0xe1, 0xcf } };
 
@@ -83,6 +92,9 @@ namespace foo_skipcount {
 					break;
 				case cmd_clear_lastskip:
 					return guid_clear_lastskip;
+					break;
+				case cmd_clear_allbutlastskip:
+					return guid_clear_allbutlastskip;
 					break;
 				case cmd_clear_skiptimes:
 					return guid_clear_skiptimes;
@@ -96,11 +108,15 @@ namespace foo_skipcount {
 		bool get_item_description(unsigned p_index, pfc::string_base& p_out) {
 			switch(p_index) {
 				case cmd_clear_skipcount:
-					p_out = "Clears all recorded skips for selected tracks.";
+					p_out = "Clears recorded skip counts for selected tracks.";
 					return true;
 					break;
 				case cmd_clear_lastskip:
 					p_out = "Clears most recent skip timestamp for selected tracks.";
+					return true;
+					break;
+				case cmd_clear_allbutlastskip:
+					p_out = "Clears all but the most recent skip timestamp for selected tracks.";
 					return true;
 					break;
 				case cmd_clear_skiptimes:
