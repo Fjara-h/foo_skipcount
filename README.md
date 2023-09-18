@@ -2,9 +2,9 @@
 
 Track skip statistics for foobar2000
 
-The custom column pattern is %skip_count%.
+The custom column pattern is %skip_count%, %last_skip%, %skip_times_raw%, and %skip_times_js%.
 
-Runs on Foobar2000 32-bit, 64-bit and legacy Foobar2000 1.5 up.
+Runs on Foobar2000 32-bit, 64-bit and legacy Foobar2000 1.5/1.6.
 
 # Build notes
 
