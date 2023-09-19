@@ -13,7 +13,7 @@ namespace foo_skipcount {
 	// Simple context menu item class.
 	class my_item : public contextmenu_item_simple {
 	public:
-		enum {
+		enum contextClear {
 			cmd_clear_skipcount = 0,
 			cmd_clear_lastskip = 1,
 			cmd_clear_allbutlastskip = 2,
@@ -58,16 +58,10 @@ namespace foo_skipcount {
 		void context_command(unsigned int p_index, metadb_handle_list_cref p_data, const GUID& p_caller) {
 			switch(p_index) {
 				case cmd_clear_skipcount:
-					clearSkipCount(p_data);
-					break;
 				case cmd_clear_lastskip:
-					clearLastSkip(p_data);
-					break;
 				case cmd_clear_allbutlastskip:
-					clearAllButRecentSkip(p_data);
-					break;
 				case cmd_clear_skiptimes:
-					clearSkipTimestamp(p_data);
+					contextClear(p_data);
 					break;
 				default:
 					uBugCheck();

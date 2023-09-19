@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "preferences.h"
+#include "contextmenu.cpp"
 
 using namespace pfc;
 
@@ -254,7 +255,7 @@ namespace foo_skipcount {
 	}
 
 	// Context Menu functions
-	void clearSkipCount(metadb_handle_list_cref items) {
+	void contextClear(metadb_handle_list_cref items, int contextClearEnum) {
 		try {
 			if(items.get_count() == 0) {
 				throw pfc::exception_invalid_params();
@@ -267,109 +268,30 @@ namespace foo_skipcount {
 				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
 
 				record_t record = getRecord(hash);
-				record.skipCountNext = 0;
-				record.skipCountRandom = 0;
-				record.skipCountPrevious = 0;
-				setRecord(hash, record);
-				tmp += hash;
-			}
-
-			pfc::list_t<metadb_index_hash> hashes;
-			for(auto iter = tmp.first(); iter.is_valid(); iter++) {
-				const metadb_index_hash hash = *iter;
-				hashes += hash;
-			}
-
-			theAPI()->dispatch_refresh(guid_foo_skipcount_index, hashes);
-		} catch(std::exception const& e) {
-			popup_message::g_complain("Could not clear skip information", e);
-		}
-	}
-
-	void clearLastSkip(metadb_handle_list_cref items) {
-		try {
-			if(items.get_count() == 0) {
-				throw pfc::exception_invalid_params();
-			}
-
-			pfc::avltree_t<metadb_index_hash> tmp;
-
-			for(size_t t = 0; t < items.get_count(); t++) {
-				metadb_index_hash hash;
-				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
-
-				record_t record = getRecord(hash);
-				if(!record.skipTimes.empty()) {
-					record.skipTimes.pop_back();
-					record.skipTimesCounter--;
+				// setRecord does not come after to avoid unnecessary writes if skipTimes is empty
+				if(contextClearEnum == foo_skipcount::my_item::contextClear::cmd_clear_skipcount) {
+					record.skipCountNext = 0;
+					record.skipCountRandom = 0;
+					record.skipCountPrevious = 0;
 					setRecord(hash, record);
 				}
-				tmp += hash;
-			}
-
-			pfc::list_t<metadb_index_hash> hashes;
-			for(auto iter = tmp.first(); iter.is_valid(); iter++) {
-				const metadb_index_hash hash = *iter;
-				hashes += hash;
-			}
-
-			theAPI()->dispatch_refresh(guid_foo_skipcount_index, hashes);
-		} catch(std::exception const& e) {
-			popup_message::g_complain("Could not clear skip information", e);
-		}
-	}
-
-	void clearAllButRecentSkip(metadb_handle_list_cref items) {
-		try {
-			if(items.get_count() == 0) {
-				throw pfc::exception_invalid_params();
-			}
-
-			pfc::avltree_t<metadb_index_hash> tmp;
-
-			for(size_t t = 0; t < items.get_count(); t++) {
-				metadb_index_hash hash;
-				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
-
-				record_t record = getRecord(hash);
-				if(record.skipTimes.size() > 1) { 
-					t_filetimestamp recent = record.skipTimes.back();
-					record.skipTimes.clear();
-					record.skipTimes.push_back(recent);
-					record.skipTimesCounter = 1;
+				else if(!record.skipTimes.empty()) {
+					if(contextClearEnum == foo_skipcount::my_item::contextClear::cmd_clear_lastskip) {
+						record.skipTimes.pop_back();
+					}
+					else { // Clear all but recent || clear all
+						t_filetimestamp recent;
+						if(contextClearEnum == foo_skipcount::my_item::contextClear::cmd_clear_allbutlastskip) {
+							 recent = record.skipTimes.back();
+						}
+						record.skipTimes.clear();
+						if(contextClearEnum == foo_skipcount::my_item::contextClear::cmd_clear_allbutlastskip) {
+							record.skipTimes.push_back(recent);
+						}
+					}
+					record.skipTimesCounter = record.skipTimes.size();
 					setRecord(hash, record);
 				}
-			}
-
-			pfc::list_t<metadb_index_hash> hashes;
-			for(auto iter = tmp.first(); iter.is_valid(); iter++) {
-				const metadb_index_hash hash = *iter;
-				hashes += hash;
-			}
-
-			theAPI()->dispatch_refresh(guid_foo_skipcount_index, hashes);
-		} catch(std::exception const& e) {
-			popup_message::g_complain("Could not clear skip information", e);
-		}
-	}
-
-	void clearSkipTimestamp(metadb_handle_list_cref items) {
-		try {
-			if(items.get_count() == 0) {
-				throw pfc::exception_invalid_params();
-			}
-
-			pfc::avltree_t<metadb_index_hash> tmp;
-
-			for(size_t t = 0; t < items.get_count(); t++) {
-				metadb_index_hash hash;
-				clientByGUID(guid_foo_skipcount_index)->hashHandle(items[t], hash);
-
-				record_t record = getRecord(hash);
-				// Potential conditional placement to avoid a set operation
-				record.skipTimesCounter = 0;
-				record.skipTimes.clear();
-				setRecord(hash, record);
 				tmp += hash;
 			}
 

@@ -27,10 +27,7 @@ namespace foo_skipcount {
 	record_t getRecord(metadb_index_hash, const GUID index_guid = guid_foo_skipcount_index);
 	void setRecord(metadb_index_hash, record_t, const GUID index_guid = guid_foo_skipcount_index);
 
-	void clearSkipCount(metadb_handle_list_cref);
-	void clearLastSkip(metadb_handle_list_cref);
-	void clearAllButRecentSkip(metadb_handle_list_cref);
-	void clearSkipTimestamp(metadb_handle_list_cref);
+	void contextClear(metadb_handle_list_cref, int);
 
 	metadb_index_manager::ptr theAPI();
 
