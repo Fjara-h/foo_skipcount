@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "preferences.h"
-#include "contextmenu.cpp"
+#include "contextmenu.h"
 
 using namespace pfc;
 
@@ -269,23 +269,23 @@ namespace foo_skipcount {
 
 				record_t record = getRecord(hash);
 				// setRecord does not come after to avoid unnecessary writes if skipTimes is empty
-				if(contextClearEnum == foo_skipcount::my_item::contextClear::cmd_clear_skipcount) {
+				if(contextClearEnum == cmd_clear_skipcount) {
 					record.skipCountNext = 0;
 					record.skipCountRandom = 0;
 					record.skipCountPrevious = 0;
 					setRecord(hash, record);
 				}
 				else if(!record.skipTimes.empty()) {
-					if(contextClearEnum == foo_skipcount::my_item::contextClear::cmd_clear_lastskip) {
+					if(contextClearEnum == cmd_clear_lastskip) {
 						record.skipTimes.pop_back();
 					}
 					else { // Clear all but recent || clear all
 						t_filetimestamp recent;
-						if(contextClearEnum == foo_skipcount::my_item::contextClear::cmd_clear_allbutlastskip) {
+						if(contextClearEnum == cmd_clear_allbutlastskip) {
 							 recent = record.skipTimes.back();
 						}
 						record.skipTimes.clear();
-						if(contextClearEnum == foo_skipcount::my_item::contextClear::cmd_clear_allbutlastskip) {
+						if(contextClearEnum == cmd_clear_allbutlastskip) {
 							record.skipTimes.push_back(recent);
 						}
 					}

@@ -156,7 +156,7 @@ namespace foo_skipcount {
 	t_uint32 my_preferences::get_state() {
 		// IMPORTANT: Always return dark_mode_supported
 		t_uint32 state = preferences_state::resettable | preferences_state::dark_mode_supported;
-		if (HasChanged()) state |= preferences_state::changed;
+		if(HasChanged()) { state |= preferences_state::changed; }
 		return state;
 	}
 
@@ -175,7 +175,6 @@ namespace foo_skipcount {
 	}
 
 	void my_preferences::apply() {
-		
 		cfg_countNext = (t_int32)SendDlgItemMessage(IDC_COUNT_NEXT, BM_GETCHECK);
 		cfg_countRandom = (t_int32)SendDlgItemMessage(IDC_COUNT_RANDOM, BM_GETCHECK);
 		cfg_countPrevious = (t_int32)SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_GETCHECK);
