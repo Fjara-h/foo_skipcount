@@ -7,10 +7,18 @@
 #include <helpers/DarkMode.h>
 #endif // _WIN32
 
+// Conditions
 enum {
 	TIME = 0,
 	PERCENT = 1,
 	TIMEANDPERCENT = 2,
+};
+
+// Skip times logging
+enum {
+	NOLOG = 0,
+	LOGLAST = 1,
+	LOGALL = 2,
 };
 
 namespace foo_skipcount {
@@ -21,13 +29,12 @@ namespace foo_skipcount {
 		cfg_countPrevious,
 		cfg_countFromPause,
 		cfg_countFromStop,
-		cfg_lastSkip,
-		cfg_skipTimes,
 		cfg_skipProtectionPrevious;
 
-	extern cfg_uint cfg_condition,
+	extern cfg_uint cfg_time,
 		cfg_percent,
-		cfg_time;
+		cfg_condition,
+		cfg_logSkipTimes;
 
 	// Defaults
 	static const bool default_cfg_countNext = true,
@@ -35,14 +42,12 @@ namespace foo_skipcount {
 		default_cfg_countPrevious = false,
 		default_cfg_countFromPause = true,
 		default_cfg_countFromStop = false,
-		default_cfg_lastSkip = false,
-		default_cfg_skipTimes = false,
 		default_cfg_skipProtectionPrevious = true;
 
-	static const t_uint default_cfg_condition = 0,
-		default_cfg_percent = 5,
-		default_cfg_time = 5;
-
+	static const t_uint default_cfg_percent = 5,
+		default_cfg_time = 5,
+		default_cfg_condition = 0,
+		default_cfg_logSkipTimes = 0;
 
 #ifdef _WIN32
 	class my_preferences : public CDialogImpl<my_preferences>, public preferences_page_instance {
@@ -64,12 +69,11 @@ namespace foo_skipcount {
 		static GUID guid_cfg_countRandom;
 		static GUID guid_cfg_countPrevious;
 		static GUID guid_cfg_condition;
-		static GUID guid_cfg_percent;
 		static GUID guid_cfg_time;
+		static GUID guid_cfg_percent;
 		static GUID guid_cfg_countFromPause;
 		static GUID guid_cfg_countFromStop;
-		static GUID guid_cfg_lastSkip;
-		static GUID guid_cfg_skipTimes;
+		static GUID guid_cfg_logSkipTimes;
 		static GUID guid_cfg_skipProtectionPrevious;
 
 		// WTL message map
@@ -79,12 +83,11 @@ namespace foo_skipcount {
 			COMMAND_HANDLER_EX(IDC_COUNT_RANDOM, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_PREVIOUS, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_CONDITION, CBN_SELCHANGE, OnSelectionChange)
-			COMMAND_HANDLER_EX(IDC_PERCENT, EN_CHANGE, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_TIME, EN_CHANGE, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_PERCENT, EN_CHANGE, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_PAUSE, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_STOP, BN_CLICKED, OnEditChange)
-			COMMAND_HANDLER_EX(IDC_LAST_SKIPPED, BN_CLICKED, OnEditChange)
-			COMMAND_HANDLER_EX(IDC_SKIP_TIMES, EN_CHANGE, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_LOG_SKIP_TIMES, CBN_SELCHANGE, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_PREVIOUS, BN_CLICKED, OnEditChange)
 		END_MSG_MAP()
 
@@ -98,7 +101,7 @@ namespace foo_skipcount {
 		void my_preferences::OnChanged();
 
 		const preferences_page_callback::ptr m_callback;
-		CToolTipCtrl tooltips[12];
+		CToolTipCtrl tooltips[10];
 
 		// Dark mode hooks object, must be a member of dialog class.
 		fb2k::CDarkModeHooks m_dark;

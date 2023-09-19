@@ -93,10 +93,10 @@ namespace foo_skipcount {
 		}
 		if(didIncrement) {
 			t_filetimestamp time = filetimestamp_from_system_timer();
-			if(cfg_lastSkip && !cfg_skipTimes && !record.skipTimes.empty()) {
+			if(cfg_logSkipTimes == LOGLAST && !record.skipTimes.empty()) {
 					record.skipTimes.back() = time;
 			}
-			if(cfg_skipTimes) {
+			else if(cfg_logSkipTimes != NOLOG) {
 				record.skipTimesCounter++;
 				record.skipTimes.push_back(time);
 			}			

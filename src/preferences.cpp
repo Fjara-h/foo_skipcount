@@ -26,10 +26,8 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_countFromPause = { 0xc2a71eb9, 0xe63d, 0x433b, { 0x84, 0xcf, 0x0b, 0xe3, 0x0d, 0xfd, 0x47, 0xb0 } };
 	// {9C746A7C-24DF-450A-BEBF-F63F14C6BF57}
 	static constexpr GUID guid_cfg_countFromStop = { 0x9c746a7c, 0x24df, 0x450a, { 0xbe, 0xbf, 0xf6, 0x3f, 0x14, 0xc6, 0xbf, 0x57 } };
-	// {800D9D04-CB2E-4D30-9094-522CCF54F5FE}
-	static constexpr GUID guid_cfg_lastSkip = { 0x800d9d04, 0xcb2e, 0x4d30, { 0x90, 0x94, 0x52, 0x2c, 0xcf, 0x54, 0xf5, 0xfe } };
 	// {99F52995-6A9D-48C8-8C10-EFC0DCCA0C09}
-	static constexpr GUID guid_cfg_skipTimes = { 0x99f52995, 0x6a9d, 0x48c8, { 0x8c, 0x10, 0xef, 0xc0, 0xdc, 0xca, 0x0c, 0x09 } };
+	static constexpr GUID guid_cfg_logSkipTimes = { 0x99f52995, 0x6a9d, 0x48c8, { 0x8c, 0x10, 0xef, 0xc0, 0xdc, 0xca, 0x0c, 0x09 } };
 	// {E958AC28-1626-422F-B0F0-356223DC7EDB}
 	static constexpr GUID guid_cfg_skipProtectionPrevious = { 0xe958ac28, 0x1626, 0x422f, { 0xb0, 0xf0, 0x35, 0x62, 0x23, 0xdc, 0x7e, 0xdb } };
 
@@ -39,13 +37,12 @@ namespace foo_skipcount {
 		cfg_countPrevious(guid_cfg_countPrevious, default_cfg_countPrevious),
 		cfg_countFromPause(guid_cfg_countFromPause, default_cfg_countFromPause),
 		cfg_countFromStop(guid_cfg_countFromStop, default_cfg_countFromStop),
-		cfg_skipTimes(guid_cfg_skipTimes, default_cfg_skipTimes),
-		cfg_lastSkip(guid_cfg_lastSkip, default_cfg_lastSkip),
 		cfg_skipProtectionPrevious(guid_cfg_skipProtectionPrevious, default_cfg_skipProtectionPrevious);
 
-	cfg_uint cfg_condition(guid_cfg_condition, default_cfg_condition),
+	cfg_uint cfg_time(guid_cfg_time, default_cfg_time),
 		cfg_percent(guid_cfg_percent, default_cfg_percent),
-		cfg_time(guid_cfg_time, default_cfg_time);
+		cfg_condition(guid_cfg_condition, default_cfg_condition), 
+		cfg_logSkipTimes(guid_cfg_logSkipTimes, default_cfg_logSkipTimes);
 
 #ifdef _WIN32
 	BOOL my_preferences::OnInitDialog(CWindow, LPARAM) {
@@ -62,12 +59,17 @@ namespace foo_skipcount {
 		::uSendMessageText(conditionDropList, CB_ADDSTRING, 0, "Time and Percent");
 		::SendMessage(conditionDropList, CB_SETCURSEL, (WPARAM)cfg_condition, NULL);
 
-		SetDlgItemInt(IDC_PERCENT, cfg_percent, FALSE);
 		SetDlgItemInt(IDC_TIME, cfg_time, FALSE);
+		SetDlgItemInt(IDC_PERCENT, cfg_percent, FALSE);
 		SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_SETCHECK, cfg_countFromPause);
 		SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_SETCHECK, cfg_countFromStop);
-		SendDlgItemMessage(IDC_LAST_SKIPPED, BM_SETCHECK, cfg_lastSkip);
-		SendDlgItemMessage(IDC_SKIP_TIMES, BM_SETCHECK, cfg_skipTimes);
+
+		CComboBox logSkipTimesDropList = (CComboBox)GetDlgItem(IDC_LOG_SKIP_TIMES);
+		::uSendMessageText(logSkipTimesDropList, CB_ADDSTRING, 0, "None");
+		::uSendMessageText(logSkipTimesDropList, CB_ADDSTRING, 0, "Last");
+		::uSendMessageText(logSkipTimesDropList, CB_ADDSTRING, 0, "All");
+		::SendMessage(logSkipTimesDropList, CB_SETCURSEL, (WPARAM)cfg_logSkipTimes, NULL);
+
 		SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_SETCHECK, cfg_skipProtectionPrevious);
 
 		CreateTooltip(tooltips[0], m_hWnd, IDC_COUNT_NEXT,
@@ -95,13 +97,13 @@ namespace foo_skipcount {
 			L"has played. 'Time and Percent' means both conditions above must be met for a skip "
 			L" to no longer count."
 		);
-		CreateTooltip(tooltips[4], m_hWnd, IDC_PERCENT,
-			L"Percentage of song to count skip",
-			L"\nEnter a number from 0 to 100. After that percentage in the song, skips no longer count."
-		);
-		CreateTooltip(tooltips[5], m_hWnd, IDC_TIME,
+		CreateTooltip(tooltips[4], m_hWnd, IDC_TIME,
 			L"Duration of song to count skip",
 			L"\nEnter a number from 0 to 2 billion. After that duration in the song, skips no longer count."
+		);
+		CreateTooltip(tooltips[5], m_hWnd, IDC_PERCENT,
+			L"Percentage of song to count skip",
+			L"\nEnter a number from 0 to 100. After that percentage in the song, skips no longer count."
 		);
 		CreateTooltip(tooltips[6], m_hWnd, IDC_COUNT_FROM_PAUSE,
 			L"Count a skip after a pause",
@@ -113,16 +115,12 @@ namespace foo_skipcount {
 			L"\nWhen enabled and the user has stopped playback, skip-actions coming out of stopped playback "
 			L"can still count towards the statistic if the conditions are met."
 		);
-		CreateTooltip(tooltips[9], m_hWnd, IDC_LAST_SKIPPED,
-			L"Count a skip after a stop",
-			L"\nWhen enabled, logs the most recent skip date as 'YYYY-MM-DD HH:MM:SS' visible with %last_skip%"
-		);
-		CreateTooltip(tooltips[10], m_hWnd, IDC_SKIP_TIMES,
+		CreateTooltip(tooltips[8], m_hWnd, IDC_LOG_SKIP_TIMES,
 			L"Log timestamps of each skip",
-			L"\nWhen enabled, raw and JS timestamps will be logged for each skip, visible with "
-			L"%skip_times_raw% and %skip_times_js%. This effectively over-rides the 'Log last date skipped' to be true."
+			L"\n'None' will not log any skips. 'Last' only tracks the most recent skip with %last_skip%. "
+			L"'All' logs every skip which and can be displayed with %skip_times_raw% and %skip_times_js%."
 		);
-		CreateTooltip(tooltips[11], m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS,
+		CreateTooltip(tooltips[9], m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS,
 			L"Disable skip counting for 1 second after using Previous Song",
 			L"\nWhen enabled, using a control during the condition that would normally count as a skip "
 			L"after pressing Previous Song will not count as a skip. This is for accidental pressing or "
@@ -167,12 +165,11 @@ namespace foo_skipcount {
 		SendDlgItemMessage(IDC_COUNT_RANDOM, BM_SETCHECK, default_cfg_countRandom);
 		SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_SETCHECK, default_cfg_countPrevious);
 		GetDlgItem(IDC_CONDITION).SendMessage(CB_SETCURSEL, (WPARAM)default_cfg_condition, NULL);
-		SetDlgItemInt(IDC_PERCENT, default_cfg_percent, FALSE);
 		SetDlgItemInt(IDC_TIME, default_cfg_time, FALSE);
+		SetDlgItemInt(IDC_PERCENT, default_cfg_percent, FALSE);
 		SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_SETCHECK, default_cfg_countFromPause);
 		SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_SETCHECK, default_cfg_countFromStop);
-		SendDlgItemMessage(IDC_LAST_SKIPPED, BM_SETCHECK, default_cfg_lastSkip);
-		SendDlgItemMessage(IDC_SKIP_TIMES, BM_SETCHECK, default_cfg_skipTimes);
+		GetDlgItem(IDC_LOG_SKIP_TIMES).SendMessage(CB_SETCURSEL, (WPARAM)default_cfg_logSkipTimes, NULL);
 		SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_SETCHECK, default_cfg_skipProtectionPrevious);
 		OnChanged();
 	}
@@ -187,8 +184,7 @@ namespace foo_skipcount {
 		cfg_time = GetIntConformedToBounds(IDC_TIME, 0, default_cfg_time, 1000000000, 1000);
 		cfg_countFromPause = (t_int32)SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_GETCHECK);
 		cfg_countFromStop = (t_int32)SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_GETCHECK);
-		cfg_lastSkip = (t_int32)SendDlgItemMessage(IDC_LAST_SKIPPED, BM_GETCHECK);
-		cfg_skipTimes = (t_int32)SendDlgItemMessage(IDC_LAST_SKIPPED, BM_GETCHECK);
+		cfg_logSkipTimes = (t_int32)SendDlgItemMessage(IDC_LOG_SKIP_TIMES, CB_GETCURSEL);
 		cfg_skipProtectionPrevious = (t_int32)SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_GETCHECK);
 
 		refreshGlobal();
@@ -220,12 +216,11 @@ namespace foo_skipcount {
 			(SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countRandom ||
 			(SendMessageW(GetDlgItem(IDC_COUNT_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countPrevious ||
 			SendMessageW(GetDlgItem(IDC_CONDITION), CB_GETCURSEL, NULL, NULL) != cfg_condition ||
-			GetDlgItemInt(IDC_PERCENT, NULL, FALSE) != cfg_percent ||
 			GetDlgItemInt(IDC_TIME, NULL, FALSE) != cfg_time ||
+			GetDlgItemInt(IDC_PERCENT, NULL, FALSE) != cfg_percent ||
 			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromPause ||
 			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromStop ||
-			(SendMessageW(GetDlgItem(IDC_SKIP_TIMES), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_skipTimes ||
-			(SendMessageW(GetDlgItem(IDC_LAST_SKIPPED), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_lastSkip ||
+			SendMessageW(GetDlgItem(IDC_LOG_SKIP_TIMES), CB_GETCURSEL, NULL, NULL) != cfg_logSkipTimes ||
 			(SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_skipProtectionPrevious;
 	}
 
