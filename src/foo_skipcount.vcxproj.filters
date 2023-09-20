@@ -36,6 +36,9 @@
     <ClInclude Include="preferences.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fields.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="contextmenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>

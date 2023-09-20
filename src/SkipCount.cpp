@@ -26,10 +26,6 @@ namespace foo_skipcount {
 		g_cachedAPI->dispatch_refresh(guid_foo_skipcount_index, hash);
 	}
 
-	void refreshGlobal() {
-		g_cachedAPI->dispatch_global_refresh();
-	}
-
 	// Called from init_stage_callback to hook into metadb
 	// This is done properly, early, to prevent dispatch_global_refresh() with newly added fields from hammering playlists, etc.
 	void addMetadbIndexes() {
@@ -289,7 +285,7 @@ namespace foo_skipcount {
 							record.skipTimes.push_back(recent);
 						}
 					}
-					record.skipTimesCounter = record.skipTimes.size();
+					record.skipTimesCounter = static_cast<int>(record.skipTimes.size());
 					setRecord(hash, record);
 				}
 				tmp += hash;

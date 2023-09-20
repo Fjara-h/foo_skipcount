@@ -255,6 +255,7 @@ copy /Y "$(TargetPath)" "$(TargetDir)..\..\..\foobar2000 (x64)\profile\user-comp
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contextmenu.h" />
+    <ClInclude Include="fields.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="preferences.h" />
     <ClInclude Include="SkipCount.h" />
