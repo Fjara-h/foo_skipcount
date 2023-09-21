@@ -50,30 +50,33 @@ END
 // Dialog
 //
 
-IDD_PREFERENCES DIALOGEX 0, 0, 288, 135
+IDD_PREFERENCES DIALOGEX 0, 0, 288, 240
 STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
 FONT 8, "Microsoft Sans Serif", 400, 0, 0x0
 BEGIN
-    CONTROL         "Increment on Next Song press",IDC_COUNT_NEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,18,119,8
-    CONTROL         "Increment on Random Song press",IDC_COUNT_RANDOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,29,122,8
+    GROUPBOX        "Skip Count",IDC_STATIC,16,18,256,91,WS_CLIPSIBLINGS
+    CONTROL         "Increment on Next Song press",IDC_COUNT_NEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,30,109,8
+    CONTROL         "Increment on Random Song press",IDC_COUNT_RANDOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,41,121,8
     CONTROL         "Increment on Previous Song press",IDC_COUNT_PREVIOUS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,40,124,8
-    LTEXT           "Count skip before:",IDC_STATIC,26,52,59,8
-    COMBOBOX        IDC_CONDITION,85,50,67,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Percent:",IDC_STATIC,26,67,27,8
-    EDITTEXT        IDC_PERCENT,55,66,29,13,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           " %",IDC_STATIC,85,67,10,8
-    LTEXT           "Duration:",IDC_STATIC,26,83,28,8
-    EDITTEXT        IDC_TIME,55,81,54,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           " sec",IDC_STATIC,109,83,15,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,52,121,8
+    LTEXT           "Count skip before:",IDC_STATIC,21,65,59,8
+    COMBOBOX        IDC_CONDITION,82,63,67,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Percent:",IDC_STATIC,31,81,27,8
+    EDITTEXT        IDC_PERCENT,59,78,29,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           " %",IDC_STATIC,89,81,10,8
+    LTEXT           "Duration:",IDC_STATIC,30,96,28,8
+    EDITTEXT        IDC_TIME,59,94,54,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           " sec",IDC_STATIC,113,96,15,8
     CONTROL         "Allow increment from paused",IDC_COUNT_FROM_PAUSE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,18,110,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,149,41,110,8
     CONTROL         "Allowed increment from stopped",IDC_COUNT_FROM_STOP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,29,113,8
-    LTEXT           "Log skips:",IDC_STATIC,26,97,59,8
-    COMBOBOX        IDC_LOG_SKIP_TIMES,60,96,67,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Skip Protection: Disable counting increments for 1s after using Previous",IDC_SKIP_PROTECTION_PREVIOUS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,16,111,246,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,149,30,113,8
+    GROUPBOX        "Logging",IDC_STATIC,16,109,256,26,WS_CLIPSIBLINGS
+    LTEXT           "Log skips:",IDC_STATIC,25,122,33,8
+    COMBOBOX        IDC_LOG_SKIP_TIMES,58,119,67,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Skip Protection",IDC_STATIC,16,135,256,58,WS_CLIPSIBLINGS
+    CONTROL         "Disable counting increments for 1s after using Previous",IDC_SKIP_PROTECTION_PREVIOUS,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,16,159,246,8
 END
 
 
@@ -89,30 +92,33 @@ BEGIN
     BEGIN
         LEFTMARGIN, 16
         RIGHTMARGIN, 272
-        VERTGUIDE, 26
-        VERTGUIDE, 152
-        VERTGUIDE, 162
-        VERTGUIDE, 194
+        VERTGUIDE, 21
+        VERTGUIDE, 58
+        VERTGUIDE, 144
+        VERTGUIDE, 149
         TOPMARGIN, 18
-        BOTTOMMARGIN, 121
-        HORZGUIDE, 26
-        HORZGUIDE, 29
+        BOTTOMMARGIN, 226
+        HORZGUIDE, 27
+        HORZGUIDE, 30
         HORZGUIDE, 37
-        HORZGUIDE, 40
-        HORZGUIDE, 47
-        HORZGUIDE, 50
+        HORZGUIDE, 41
+        HORZGUIDE, 49
+        HORZGUIDE, 52
         HORZGUIDE, 60
         HORZGUIDE, 63
-        HORZGUIDE, 66
+        HORZGUIDE, 73
         HORZGUIDE, 75
         HORZGUIDE, 78
-        HORZGUIDE, 81
-        HORZGUIDE, 83
-        HORZGUIDE, 93
-        HORZGUIDE, 96
-        HORZGUIDE, 105
-        HORZGUIDE, 108
-        HORZGUIDE, 111
+        HORZGUIDE, 89
+        HORZGUIDE, 91
+        HORZGUIDE, 94
+        HORZGUIDE, 104
+        HORZGUIDE, 106
+        HORZGUIDE, 109
+        HORZGUIDE, 119
+        HORZGUIDE, 130
+        HORZGUIDE, 132
+        HORZGUIDE, 135
     END
 END
 #endif    // APSTUDIO_INVOKED
