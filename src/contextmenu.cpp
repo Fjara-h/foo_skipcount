@@ -1,8 +1,8 @@
 #include "contextmenu.h"
 #include "SkipCount.h"
+#include "fields.h"
 
 namespace foo_skipcount {
-
 	void my_contextmenu_item::get_item_name(unsigned int p_index, pfc::string_base &p_out) {
 		switch(p_index) {
 			case cmd_clear_skipcount:

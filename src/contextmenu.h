@@ -2,16 +2,17 @@
 #include "stdafx.h"
 #include "globals.h"
 
-// Skip times logging
-enum ContextClearEnum {
-	cmd_clear_skipcount = 0,
-	cmd_clear_lastskip = 1,
-	cmd_clear_allbutlastskip = 2,
-	cmd_clear_skiptimes = 3,
-	cmd_total
-};
-
 namespace foo_skipcount {
+
+	// Skip times logging
+	enum ContextClearEnum {
+		cmd_clear_skipcount = 0,
+		cmd_clear_lastskip = 1,
+		cmd_clear_allbutlastskip = 2,
+		cmd_clear_skiptimes = 3,
+		cmd_total
+	};
+
 	// Context menu group.
 	// {3AEB1668-9FD0-450F-856F-EB6C1C240187}
 	static const GUID context_menu_guid = { 0x3aeb1668, 0x9fd0, 0x450f, { 0x85, 0x6f, 0xeb, 0x6c, 0x1c, 0x24, 0x01, 0x87 } };

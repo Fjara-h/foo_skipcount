@@ -1,5 +1,4 @@
 #pragma once
-
 #include "globals.h"
 
 namespace foo_skipcount {
@@ -22,6 +21,7 @@ namespace foo_skipcount {
 	};
 
 	void refreshSingle(GUID, metadb_index_hash);
+	void refreshGlobal();
 
 	record_t getRecord(metadb_index_hash, const GUID index_guid = guid_foo_skipcount_index);
 	void setRecord(metadb_index_hash, record_t, const GUID index_guid = guid_foo_skipcount_index);

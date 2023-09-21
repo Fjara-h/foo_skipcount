@@ -1,10 +1,11 @@
 #include <string>
 
 #include "fields.h"
-#include "preferences.h"
-#include "SkipCount.h"
 
 #include <helpers/filetimetools.h>
+
+#include "preferences.h"
+#include "SkipCount.h"
 
 namespace foo_skipcount {
 
@@ -219,6 +220,4 @@ namespace foo_skipcount {
 			p_out.set_property(strPropertiesGroup, priorityBase + 3, PFC_string_formatter() << "Skip times JS", PFC_string_formatter() << skipTimesJSStr);
 		}
 	}
-
-
 } // namespace foo_skipcount

@@ -165,7 +165,7 @@ namespace foo_skipcount {
 		cfg_logSkipTimes = (t_int32)SendDlgItemMessage(IDC_LOG_SKIP_TIMES, CB_GETCURSEL);
 		cfg_skipProtectionPrevious = (t_int32)SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_GETCHECK);
 
-		g_cachedAPI->dispatch_global_refresh();
+		refreshGlobal();
 		OnChanged(); // Dialog content has not changed but the flags have - shown values now match the settings so the apply button can be disabled
 	}
 
