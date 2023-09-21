@@ -11,10 +11,10 @@ namespace foo_skipcount {
 
 	class my_initquit : public initquit {
 	public:
-		void on_init() final {
+		inline void on_init() final {
 			FB2K_console_formatter() << COMPONENT_NAME ": loaded";
 		}
-		void on_quit() final {
+		inline void on_quit() final {
 			foobarQuitting();
 			FB2K_console_formatter() << COMPONENT_NAME ": unloading";
 		}

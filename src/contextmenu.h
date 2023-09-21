@@ -22,11 +22,11 @@ namespace foo_skipcount {
 	// Simple context menu item class.
 	class my_contextmenu_item : public contextmenu_item_simple {
 	public:
-		GUID get_parent() {
+		inline GUID get_parent() {
 			return context_menu_guid;
 		}
 
-		unsigned get_num_items() {
+		inline unsigned get_num_items() {
 			return cmd_total;
 		}
 		void get_item_name(unsigned int, pfc::string_base&);

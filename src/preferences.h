@@ -133,7 +133,7 @@ namespace foo_skipcount {
 	class my_preferences_page : public preferences_page_impl<my_preferences> {
 
 	public:
-		const char* get_name() override;
+		inline const char* get_name() override;
 
 		// {B6F5B09F-4926-449E-A30B-121DF1D7E9E4}
 		inline GUID get_guid() override {

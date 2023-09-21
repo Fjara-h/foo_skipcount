@@ -20,7 +20,7 @@ namespace foo_skipcount {
 		std::vector<t_filetimestamp> skipTimes;
 	};
 
-	void refreshSingle(GUID, metadb_index_hash);
+	inline void refreshSingle(GUID, metadb_index_hash);
 	void refreshGlobal();
 
 	record_t getRecord(metadb_index_hash, const GUID index_guid = guid_foo_skipcount_index);

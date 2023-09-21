@@ -85,7 +85,7 @@ namespace foo_skipcount {
 		return count;
 	}
 
-	static std::string getSkipCountStr(metadb_index_hash hash) {
+	inline static std::string getSkipCountStr(metadb_index_hash hash) {
 		record_t record = getRecord(hash);
 		return std::to_string(getSkipCount(record));
 	}

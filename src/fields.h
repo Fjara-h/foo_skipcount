@@ -14,7 +14,7 @@ namespace foo_skipcount {
 
 	class my_metadb_display_field_provider : public metadb_display_field_provider {
 	public:
-		t_uint32 get_field_count() {
+		inline t_uint32 get_field_count() {
 			return MAX_NUM_FIELDS;
 		}
 
@@ -41,7 +41,7 @@ namespace foo_skipcount {
 			}
 		}
 
-		bool is_our_tech_info(const char* p_name) {
+		inline bool is_our_tech_info(const char* p_name) {
 			// No tech info read from files
 			return false;
 		}
