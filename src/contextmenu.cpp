@@ -6,15 +6,15 @@ namespace foo_skipcount {
 	void my_contextmenu_item::get_item_name(unsigned int p_index, pfc::string_base &p_out) {
 		switch(p_index) {
 			case cmd_clear_skipcount:
-				p_out = "Clear saved skip count";
+				p_out = "Clear skip count";
 				break;
 			case cmd_clear_lastskip:
 				p_out = "Clear most recent skip timestamp";
 				break;
-			case cmd_clear_allbutlastskip:
+			case cmd_clear_allbutlastskiptimes:
 				p_out = "Clear all but most recent skip timstamp";
 				break;
-			case cmd_clear_skiptimes:
+			case cmd_clear_allskiptimes:
 				p_out = "Clear skip timestamps";
 				break;
 			default:
@@ -33,8 +33,8 @@ namespace foo_skipcount {
 		switch(p_index) {
 			case cmd_clear_skipcount:
 			case cmd_clear_lastskip:
-			case cmd_clear_allbutlastskip:
-			case cmd_clear_skiptimes:
+			case cmd_clear_allbutlastskiptimes:
+			case cmd_clear_allskiptimes:
 				contextClear(p_data, p_index);
 				break;
 			default:
@@ -61,10 +61,10 @@ namespace foo_skipcount {
 			case cmd_clear_lastskip:
 				return guid_clear_lastskip;
 				break;
-			case cmd_clear_allbutlastskip:
+			case cmd_clear_allbutlastskiptimes:
 				return guid_clear_allbutlastskip;
 				break;
-			case cmd_clear_skiptimes:
+			case cmd_clear_allskiptimes:
 				return guid_clear_skiptimes;
 				break;
 			default:
@@ -83,12 +83,12 @@ namespace foo_skipcount {
 				p_out = "Clears most recent skip timestamp for selected tracks.";
 				return true;
 				break;
-			case cmd_clear_allbutlastskip:
+			case cmd_clear_allbutlastskiptimes:
 				p_out = "Clears all but the most recent skip timestamp for selected tracks.";
 				return true;
 				break;
-			case cmd_clear_skiptimes:
-				p_out = "Clears all skip timestamps on selected tracks.";
+			case cmd_clear_allskiptimes:
+				p_out = "Clears all skip timestamps for selected tracks.";
 				return true;
 				break;
 			default:

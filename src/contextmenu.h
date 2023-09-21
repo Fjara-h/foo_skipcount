@@ -8,8 +8,8 @@ namespace foo_skipcount {
 	enum ContextClearEnum {
 		cmd_clear_skipcount = 0,
 		cmd_clear_lastskip = 1,
-		cmd_clear_allbutlastskip = 2,
-		cmd_clear_skiptimes = 3,
+		cmd_clear_allbutlastskiptimes = 2,
+		cmd_clear_allskiptimes = 3,
 		cmd_total
 	};
 

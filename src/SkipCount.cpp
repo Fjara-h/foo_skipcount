@@ -281,11 +281,11 @@ namespace foo_skipcount {
 					}
 					else { // Clear all but recent || clear all
 						t_filetimestamp recent;
-						if(contextClearEnum == cmd_clear_allbutlastskip) {
+						if(contextClearEnum == cmd_clear_allbutlastskiptimes) {
 							 recent = record.skipTimes.back();
 						}
 						record.skipTimes.clear();
-						if(contextClearEnum == cmd_clear_allbutlastskip) {
+						if(contextClearEnum == cmd_clear_allbutlastskiptimes) {
 							record.skipTimes.push_back(recent);
 						}
 					}
