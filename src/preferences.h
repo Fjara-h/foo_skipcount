@@ -42,8 +42,18 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_countFromStop = { 0x9c746a7c, 0x24df, 0x450a, { 0xbe, 0xbf, 0xf6, 0x3f, 0x14, 0xc6, 0xbf, 0x57 } };
 	// {99F52995-6A9D-48C8-8C10-EFC0DCCA0C09}
 	static constexpr GUID guid_cfg_logSkipTimes = { 0x99f52995, 0x6a9d, 0x48c8, { 0x8c, 0x10, 0xef, 0xc0, 0xdc, 0xca, 0x0c, 0x09 } };
+	// {D74AF3CE-94BD-4964-8386-A11EA00DA16E}
+	static constexpr GUID guid_cfg_skipProtectionNext = { 0xd74af3ce, 0x94bd, 0x4964, { 0x83, 0x86, 0xa1, 0x1e, 0xa0, 0x0d, 0xa1, 0x6e } };
+	// {60CC830E-704C-498B-A2FC-77DEADCE3E21}
+	static constexpr GUID guid_cfg_skipProtectionNextTime = { 0x60cc830e, 0x704c, 0x498b, { 0xa2, 0xfc, 0x77, 0xde, 0xad, 0xce, 0x3e, 0x21 } };
+	// {50CEEC36-2BA7-4349-B3B4-E8A96485E4AC}
+	static constexpr GUID guid_cfg_skipProtectionRandom = { 0x50ceec36, 0x2ba7, 0x4349, { 0xb3, 0xb4, 0xe8, 0xa9, 0x64, 0x85, 0xe4, 0xac } };
+	// {06652612-AF1C-4667-B7ED-4A914FECCAA2}
+	static constexpr GUID guid_cfg_skipProtectionRandomTime = { 0x06652612, 0xaf1c, 0x4667, { 0xb7, 0xed, 0x4a, 0x91, 0x4f, 0xec, 0xca, 0xa2 } };
 	// {E958AC28-1626-422F-B0F0-356223DC7EDB}
 	static constexpr GUID guid_cfg_skipProtectionPrevious = { 0xe958ac28, 0x1626, 0x422f, { 0xb0, 0xf0, 0x35, 0x62, 0x23, 0xdc, 0x7e, 0xdb } };
+	// {8B16D08D-9169-4F1C-9102-E058DA09185C}
+	static constexpr GUID guid_cfg_skipProtectionPreviousTime = { 0x8b16d08d, 0x9169, 0x4f1c, { 0x91, 0x02, 0xe0, 0x58, 0xda, 0x09, 0x18, 0x5c } };
 
 	// Config
 	extern cfg_bool cfg_countNext,
@@ -51,12 +61,17 @@ namespace foo_skipcount {
 		cfg_countPrevious,
 		cfg_countFromPause,
 		cfg_countFromStop,
+		cfg_skipProtectionNext,
+		cfg_skipProtectionRandom,
 		cfg_skipProtectionPrevious;
 
 	extern cfg_uint cfg_time,
 		cfg_percent,
 		cfg_condition,
-		cfg_logSkipTimes;
+		cfg_logSkipTimes,
+		cfg_skipProtectionNextTime,
+		cfg_skipProtectionRandomTime,
+		cfg_skipProtectionPreviousTime;
 
 	// Defaults
 	static const bool default_cfg_countNext = true,
@@ -64,12 +79,17 @@ namespace foo_skipcount {
 		default_cfg_countPrevious = false,
 		default_cfg_countFromPause = true,
 		default_cfg_countFromStop = false,
+		default_cfg_skipProtectionNext = false,
+		default_cfg_skipProtectionRandom = false,
 		default_cfg_skipProtectionPrevious = true;
 
 	static const t_uint default_cfg_percent = 5,
 		default_cfg_time = 5,
 		default_cfg_condition = 0,
-		default_cfg_logSkipTimes = 0;
+		default_cfg_logSkipTimes = 0,
+		default_cfg_skipProtectionNextTime = 1,
+		default_cfg_skipProtectionRandomTime = 1,
+		default_cfg_skipProtectionPreviousTime = 1;
 
 #ifdef _WIN32
 	class my_preferences : public CDialogImpl<my_preferences>, public preferences_page_instance {
@@ -96,7 +116,12 @@ namespace foo_skipcount {
 		static GUID guid_cfg_countFromPause;
 		static GUID guid_cfg_countFromStop;
 		static GUID guid_cfg_logSkipTimes;
+		static GUID guid_cfg_skipProtectionNext;
+		static GUID guid_cfg_skipProtectionNextTime;
+		static GUID guid_cfg_skipProtectionRandom;
+		static GUID guid_cfg_skipProtectionRandomTime;
 		static GUID guid_cfg_skipProtectionPrevious;
+		static GUID guid_cfg_skipProtectionPreviousTime;
 
 		// WTL message map
 		BEGIN_MSG_MAP_EX(preferences)
@@ -110,7 +135,12 @@ namespace foo_skipcount {
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_PAUSE, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_STOP, BN_CLICKED, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_LOG_SKIP_TIMES, CBN_SELCHANGE, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_NEXT, BN_CLICKED, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_NEXT_TIME, EN_CHANGE, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_RANDOM, BN_CLICKED, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_RANDOM_TIME, EN_CHANGE, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_PREVIOUS, BN_CLICKED, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_SKIP_PROTECTION_PREVIOUS_TIME, EN_CHANGE, OnEditChange)
 		END_MSG_MAP()
 
 	private:
@@ -123,7 +153,7 @@ namespace foo_skipcount {
 		void my_preferences::OnChanged();
 
 		const preferences_page_callback::ptr m_callback;
-		CToolTipCtrl tooltips[10];
+		CToolTipCtrl tooltips[12];
 
 		// Dark mode hooks object, must be a member of dialog class.
 		fb2k::CDarkModeHooks m_dark;

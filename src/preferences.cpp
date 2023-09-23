@@ -4,6 +4,7 @@
 
 #include <SDK/cfg_var.h>
 #include <pfc/win-objects.cpp>
+#include <helpers/dropdown_helper.cpp>
 
 #include "globals.h"
 #include "SkipCount.h"
@@ -16,21 +17,27 @@ namespace foo_skipcount {
 		cfg_countPrevious(guid_cfg_countPrevious, default_cfg_countPrevious),
 		cfg_countFromPause(guid_cfg_countFromPause, default_cfg_countFromPause),
 		cfg_countFromStop(guid_cfg_countFromStop, default_cfg_countFromStop),
+		cfg_skipProtectionNext(guid_cfg_skipProtectionNext, default_cfg_skipProtectionNext),
+		cfg_skipProtectionRandom(guid_cfg_skipProtectionRandom, default_cfg_skipProtectionRandom),
 		cfg_skipProtectionPrevious(guid_cfg_skipProtectionPrevious, default_cfg_skipProtectionPrevious);
 
 	cfg_uint cfg_time(guid_cfg_time, default_cfg_time),
 		cfg_percent(guid_cfg_percent, default_cfg_percent),
 		cfg_condition(guid_cfg_condition, default_cfg_condition), 
-		cfg_logSkipTimes(guid_cfg_logSkipTimes, default_cfg_logSkipTimes);
+		cfg_logSkipTimes(guid_cfg_logSkipTimes, default_cfg_logSkipTimes),
+		cfg_skipProtectionNextTime(guid_cfg_skipProtectionNextTime, default_cfg_skipProtectionNextTime),
+		cfg_skipProtectionRandomTime(guid_cfg_skipProtectionRandomTime, default_cfg_skipProtectionRandomTime),
+		cfg_skipProtectionPreviousTime(guid_cfg_skipProtectionPreviousTime, default_cfg_skipProtectionPreviousTime);
 
 #ifdef _WIN32
 	BOOL my_preferences::OnInitDialog(CWindow, LPARAM) {
 		// Enable dark mode
-		m_dark.AddDialogWithControls(*this);
+		m_dark.AddDialogWithControls(m_hWnd);
 
-		SendDlgItemMessage(IDC_COUNT_NEXT, BM_SETCHECK, cfg_countNext);
-		SendDlgItemMessage(IDC_COUNT_RANDOM, BM_SETCHECK, cfg_countRandom);
-		SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_SETCHECK, cfg_countPrevious);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_NEXT, cfg_countNext);
+
+		uButton_SetCheck(m_hWnd, IDC_COUNT_RANDOM, cfg_countRandom);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_PREVIOUS, cfg_countPrevious);
 
 		CComboBox conditionDropList = (CComboBox)GetDlgItem(IDC_CONDITION);
 		::uSendMessageText(conditionDropList, CB_ADDSTRING, 0, "Time");
@@ -40,8 +47,8 @@ namespace foo_skipcount {
 
 		SetDlgItemInt(IDC_TIME, cfg_time, FALSE);
 		SetDlgItemInt(IDC_PERCENT, cfg_percent, FALSE);
-		SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_SETCHECK, cfg_countFromPause);
-		SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_SETCHECK, cfg_countFromStop);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_FROM_PAUSE, cfg_countFromPause);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_FROM_STOP, cfg_countFromStop);
 
 		CComboBox logSkipTimesDropList = (CComboBox)GetDlgItem(IDC_LOG_SKIP_TIMES);
 		::uSendMessageText(logSkipTimesDropList, CB_ADDSTRING, 0, "None");
@@ -49,7 +56,12 @@ namespace foo_skipcount {
 		::uSendMessageText(logSkipTimesDropList, CB_ADDSTRING, 0, "All");
 		::SendMessage(logSkipTimesDropList, CB_SETCURSEL, (WPARAM)cfg_logSkipTimes, NULL);
 
-		SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_SETCHECK, cfg_skipProtectionPrevious);
+		uButton_SetCheck(m_hWnd, IDC_SKIP_PROTECTION_NEXT, cfg_skipProtectionNext);
+		SetDlgItemInt(IDC_SKIP_PROTECTION_NEXT_TIME, cfg_skipProtectionNextTime, FALSE);
+		uButton_SetCheck(m_hWnd, IDC_SKIP_PROTECTION_RANDOM, cfg_skipProtectionRandom);
+		SetDlgItemInt(IDC_SKIP_PROTECTION_RANDOM_TIME, cfg_skipProtectionRandomTime, FALSE);
+		uButton_SetCheck(m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS, cfg_skipProtectionPrevious);
+		SetDlgItemInt(IDC_SKIP_PROTECTION_PREVIOUS_TIME, cfg_skipProtectionPreviousTime, FALSE);
 
 		CreateTooltip(tooltips[0], m_hWnd, IDC_COUNT_NEXT,
 			L"Add to skip count after pressing next song",
@@ -99,11 +111,23 @@ namespace foo_skipcount {
 			L"\n'None' will not log any skips. 'Last' only tracks the most recent skip with %last_skip%. "
 			L"'All' logs every skip which and can be displayed with %skip_times_raw% and %skip_times_js%."
 		);
-		CreateTooltip(tooltips[9], m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS,
-			L"Disable skip counting for 1 second after using Previous Song",
+		CreateTooltip(tooltips[9], m_hWnd, IDC_SKIP_PROTECTION_NEXT,
+			L"Disable skip counting for a user-defined time after using Next Song",
 			L"\nWhen enabled, using a control during the condition that would normally count as a skip "
-			L"after pressing Previous Song will not count as a skip. This is for accidental pressing or "
-			L" if checking which song previously played without counting as a real skip."
+			L"after pressing Next Song will not count as a skip. The duration to count skips is still"
+			L"the same as the setting above, just shifted."
+		);
+		CreateTooltip(tooltips[10], m_hWnd, IDC_SKIP_PROTECTION_RANDOM,
+			L"Disable skip counting for a user-defined time second after using Random Song",
+			L"\nWhen enabled, using a control during the condition that would normally count as a skip "
+			L"after pressing Previous Song will not count as a skip. The duration to count skips is still"
+			L"the same as the setting above, just shifted."
+		);
+		CreateTooltip(tooltips[11], m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS,
+			L"Disable skip counting for a user-defined time second after using Previous Song",
+			L"\nWhen enabled, using a control during the condition that would normally count as a skip "
+			L"after pressing Previous Song will not count as a skip. The duration to count skips is still"
+			L"the same as the setting above, just shifted."
 		);
 
 		return FALSE;
@@ -140,30 +164,40 @@ namespace foo_skipcount {
 	}
 
 	void my_preferences::reset() {
-		SendDlgItemMessage(IDC_COUNT_NEXT, BM_SETCHECK, default_cfg_countNext);
-		SendDlgItemMessage(IDC_COUNT_RANDOM, BM_SETCHECK, default_cfg_countRandom);
-		SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_SETCHECK, default_cfg_countPrevious);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_NEXT, default_cfg_countNext);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_RANDOM, default_cfg_countRandom);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_PREVIOUS,default_cfg_countPrevious);
 		GetDlgItem(IDC_CONDITION).SendMessage(CB_SETCURSEL, (WPARAM)default_cfg_condition, NULL);
 		SetDlgItemInt(IDC_TIME, default_cfg_time, FALSE);
 		SetDlgItemInt(IDC_PERCENT, default_cfg_percent, FALSE);
-		SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_SETCHECK, default_cfg_countFromPause);
-		SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_SETCHECK, default_cfg_countFromStop);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_FROM_PAUSE, default_cfg_countFromPause);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_FROM_STOP, default_cfg_countFromStop);
 		GetDlgItem(IDC_LOG_SKIP_TIMES).SendMessage(CB_SETCURSEL, (WPARAM)default_cfg_logSkipTimes, NULL);
-		SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_SETCHECK, default_cfg_skipProtectionPrevious);
+		uButton_SetCheck(m_hWnd, IDC_SKIP_PROTECTION_NEXT, default_cfg_skipProtectionNext);
+		SetDlgItemInt(IDC_SKIP_PROTECTION_NEXT_TIME, default_cfg_skipProtectionNextTime, FALSE);
+		uButton_SetCheck(m_hWnd, IDC_SKIP_PROTECTION_RANDOM, default_cfg_skipProtectionRandom);
+		SetDlgItemInt(IDC_SKIP_PROTECTION_RANDOM_TIME, default_cfg_skipProtectionRandomTime, FALSE);
+		uButton_SetCheck(m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS, default_cfg_skipProtectionPrevious);
+		SetDlgItemInt(IDC_SKIP_PROTECTION_PREVIOUS_TIME, default_cfg_skipProtectionPreviousTime, FALSE);
 		OnChanged();
 	}
 
 	void my_preferences::apply() {
-		cfg_countNext = (t_int32)SendDlgItemMessage(IDC_COUNT_NEXT, BM_GETCHECK);
-		cfg_countRandom = (t_int32)SendDlgItemMessage(IDC_COUNT_RANDOM, BM_GETCHECK);
-		cfg_countPrevious = (t_int32)SendDlgItemMessage(IDC_COUNT_PREVIOUS, BM_GETCHECK);
+		cfg_countNext = uButton_GetCheck(m_hWnd, IDC_COUNT_NEXT);
+		cfg_countRandom = uButton_GetCheck(m_hWnd, IDC_COUNT_RANDOM);
+		cfg_countPrevious = uButton_GetCheck(m_hWnd, IDC_COUNT_PREVIOUS);
 		cfg_condition = (t_int32)SendDlgItemMessage(IDC_CONDITION, CB_GETCURSEL);
 		cfg_percent = GetIntConformedToBounds(IDC_PERCENT, 0, default_cfg_percent, 100, 100);
 		cfg_time = GetIntConformedToBounds(IDC_TIME, 0, default_cfg_time, 1000000000, 1000);
-		cfg_countFromPause = (t_int32)SendDlgItemMessage(IDC_COUNT_FROM_PAUSE, BM_GETCHECK);
-		cfg_countFromStop = (t_int32)SendDlgItemMessage(IDC_COUNT_FROM_STOP, BM_GETCHECK);
+		cfg_countFromPause = uButton_GetCheck(m_hWnd, IDC_COUNT_FROM_PAUSE);
+		cfg_countFromStop = uButton_GetCheck(m_hWnd, IDC_COUNT_FROM_STOP);
 		cfg_logSkipTimes = (t_int32)SendDlgItemMessage(IDC_LOG_SKIP_TIMES, CB_GETCURSEL);
-		cfg_skipProtectionPrevious = (t_int32)SendDlgItemMessage(IDC_SKIP_PROTECTION_PREVIOUS, BM_GETCHECK);
+		cfg_skipProtectionNext = uButton_GetCheck(m_hWnd, IDC_SKIP_PROTECTION_NEXT);
+		cfg_skipProtectionNextTime = GetIntConformedToBounds(IDC_SKIP_PROTECTION_NEXT_TIME, 0, default_cfg_skipProtectionNextTime, 1000000000, 1000);
+		cfg_skipProtectionRandom = uButton_GetCheck(m_hWnd, IDC_SKIP_PROTECTION_RANDOM);
+		cfg_skipProtectionRandomTime = GetIntConformedToBounds(IDC_SKIP_PROTECTION_RANDOM_TIME, 0, default_cfg_skipProtectionRandomTime, 1000000000, 1000);
+		cfg_skipProtectionPrevious = uButton_GetCheck(m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS);
+		cfg_skipProtectionPreviousTime = GetIntConformedToBounds(IDC_SKIP_PROTECTION_PREVIOUS_TIME, 0, default_cfg_skipProtectionPreviousTime, 1000000000, 1000);
 
 		refreshGlobal();
 		OnChanged(); // Dialog content has not changed but the flags have - shown values now match the settings so the apply button can be disabled
@@ -190,16 +224,22 @@ namespace foo_skipcount {
 	bool my_preferences::HasChanged() {
 	
 		// Returns whether the settings are different from the current configuration - (De)activating the apply button
-		return (SendMessageW(GetDlgItem(IDC_COUNT_NEXT), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countNext ||
-			(SendMessageW(GetDlgItem(IDC_COUNT_RANDOM), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countRandom ||
-			(SendMessageW(GetDlgItem(IDC_COUNT_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countPrevious ||
-			SendMessageW(GetDlgItem(IDC_CONDITION), CB_GETCURSEL, NULL, NULL) != cfg_condition ||
+		//uButton_GetCheck
+		return uButton_GetCheck(m_hWnd, IDC_COUNT_NEXT) != cfg_countNext ||
+			uButton_GetCheck(m_hWnd, IDC_COUNT_RANDOM) != cfg_countRandom ||
+			uButton_GetCheck(m_hWnd, IDC_COUNT_PREVIOUS) != cfg_countPrevious ||
+			(t_int32)SendDlgItemMessage(IDC_CONDITION, CB_GETCURSEL) != cfg_condition || 
 			GetDlgItemInt(IDC_TIME, NULL, FALSE) != cfg_time ||
 			GetDlgItemInt(IDC_PERCENT, NULL, FALSE) != cfg_percent ||
-			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_PAUSE), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromPause ||
-			(SendMessageW(GetDlgItem(IDC_COUNT_FROM_STOP), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_countFromStop ||
-			SendMessageW(GetDlgItem(IDC_LOG_SKIP_TIMES), CB_GETCURSEL, NULL, NULL) != cfg_logSkipTimes ||
-			(SendMessageW(GetDlgItem(IDC_SKIP_PROTECTION_PREVIOUS), BM_GETCHECK, NULL, NULL) == BST_CHECKED) != cfg_skipProtectionPrevious;
+			uButton_GetCheck(m_hWnd, IDC_COUNT_FROM_PAUSE) != cfg_countFromPause ||
+			uButton_GetCheck(m_hWnd, IDC_COUNT_FROM_STOP) != cfg_countFromStop ||
+			(t_int32)SendDlgItemMessage(IDC_LOG_SKIP_TIMES, CB_GETCURSEL) != cfg_logSkipTimes ||
+			uButton_GetCheck(m_hWnd, IDC_SKIP_PROTECTION_NEXT) != cfg_skipProtectionNext ||
+			GetDlgItemInt(IDC_SKIP_PROTECTION_NEXT_TIME, NULL, FALSE) != cfg_skipProtectionNextTime ||
+			uButton_GetCheck(m_hWnd, IDC_SKIP_PROTECTION_RANDOM) != cfg_skipProtectionRandom ||
+			GetDlgItemInt(IDC_SKIP_PROTECTION_RANDOM_TIME, NULL, FALSE) != cfg_skipProtectionRandomTime ||
+			uButton_GetCheck(m_hWnd, IDC_SKIP_PROTECTION_PREVIOUS) != cfg_skipProtectionPrevious ||
+			GetDlgItemInt(IDC_SKIP_PROTECTION_PREVIOUS_TIME, NULL, FALSE) != cfg_skipProtectionPreviousTime;
 	}
 
 	void my_preferences::OnChanged() {

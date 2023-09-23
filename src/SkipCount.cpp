@@ -119,14 +119,17 @@ namespace foo_skipcount {
 				on_item_skipped(previousTrack, shouldCountSkipControl);
 			}
 
-			if(cfg_skipProtectionPrevious && shouldCountSkipControl == playback_control::track_command_prev) {
+			if(cfg_skipProtectionNext && shouldCountSkipControl == playback_control::track_command_next ||
+			   cfg_skipProtectionRandom && shouldCountSkipControl == playback_control::track_command_rand ||
+			   cfg_skipProtectionPrevious && shouldCountSkipControl == playback_control::track_command_prev) {
 				shouldCountSkipCondition = false;
 			}
 			else {
 				shouldCountSkipCondition = true;
 			}
+			lastSkipControl = shouldCountSkipControl;
 			shouldCountSkipControl = 0;
-			usedSkipProtection = false;
+			protectionOffsetTime = 0;
 		}
 
 		void on_playback_starting(play_control::t_track_command p_command, bool p_paused) {
@@ -147,6 +150,8 @@ namespace foo_skipcount {
 			if(p_reason != play_control::get()->stop_reason_starting_another && !(cfg_countFromStop && p_reason == play_control::get()->stop_reason_user)) {
 				previousTrack = nullptr;
 				currentTrack = nullptr;
+				protectionOffsetTime = 0;
+				lastSkipControl = 0;
 				shouldCountSkipControl = 0;
 				shouldCountSkipCondition = true;
 			}
@@ -157,6 +162,8 @@ namespace foo_skipcount {
 			if(p_state && !cfg_countFromPause) {
 				previousTrack = nullptr;
 				currentTrack = nullptr;
+				protectionOffsetTime = 0;
+				lastSkipControl = 0;
 				shouldCountSkipControl = 0;
 				shouldCountSkipCondition = true;
 			}
@@ -165,14 +172,42 @@ namespace foo_skipcount {
 		void on_playback_dynamic_info(const file_info& p_info) {}
 		void on_playback_dynamic_info_track(const file_info& p_info) {}
 		void on_playback_time(double p_time) {
-			if(cfg_skipProtectionPrevious && !usedSkipProtection && p_time >= 1) {
-				shouldCountSkipCondition = true;
-				usedSkipProtection = true;
+			//something baout this logic is wrong
+			FB2K_console_formatter() << protectionOffsetTime;
+			if(lastSkipControl != playback_control::track_command_default && protectionOffsetTime == 0) {
+				if(cfg_skipProtectionNext && lastSkipControl == playback_control::track_command_next && p_time >= cfg_skipProtectionNextTime) {
+					if(p_time < cfg_skipProtectionNextTime) {
+						return;
+					}
+					else { // p_time >= cfg_skipProtectionNextTime
+						protectionOffsetTime = cfg_skipProtectionNextTime;
+						shouldCountSkipCondition = true;
+					}
+				}
+				else if(cfg_skipProtectionRandom && lastSkipControl == playback_control::track_command_rand && p_time >= cfg_skipProtectionRandomTime) {
+					if(p_time < cfg_skipProtectionRandomTime) {
+						return;
+					}
+					else { // p_time >= cfg_skipProtectionRandomTime
+						protectionOffsetTime = cfg_skipProtectionRandomTime;
+						shouldCountSkipCondition = true;
+					}
+				}
+				else if(cfg_skipProtectionPrevious && lastSkipControl == playback_control::track_command_prev && p_time >= cfg_skipProtectionPreviousTime) {
+					if(p_time < cfg_skipProtectionPreviousTime) {
+						return;
+					}
+					else { // p_time >= cfg_skipProtectionPreviousTime
+						protectionOffsetTime = cfg_skipProtectionPreviousTime;
+						shouldCountSkipCondition = true;
+					}
+				}
 			}
-			// If user has cfg_time set to 1, it will never be incremented, so just -1 for that specific scenario
-			if(cfg_skipProtectionPrevious && usedSkipProtection && p_time >= 1) {
-				p_time--;
-			}
+
+			// Only add the offset if it will be less than 100% of total time
+			if(protectionOffsetTime > 0 && p_time + protectionOffsetTime < currentTrackTotalDuration) {
+				p_time += protectionOffsetTime;
+			}			
 
 			if(shouldCountSkipCondition) {
 				if(cfg_condition == TIME && p_time >= double(cfg_time)) {
@@ -194,8 +229,8 @@ namespace foo_skipcount {
 		}
 	private:
 		metadb_handle_ptr currentTrack, previousTrack;
-		bool shouldCountSkipCondition = false, usedSkipProtection = false;
-		unsigned int shouldCountSkipControl = 0;
+		bool shouldCountSkipCondition = false;
+		unsigned int shouldCountSkipControl = 0, lastSkipControl = 0, protectionOffsetTime = 0;
 		double currentTrackTotalDuration = 0;
 	};
 
@@ -279,7 +314,7 @@ namespace foo_skipcount {
 					if(contextClearEnum == cmd_clear_lastskip) {
 						record.skipTimes.pop_back();
 					}
-					else { // Clear all but recent || clear all
+					else { // Clear all but last || clear all
 						t_filetimestamp recent;
 						if(contextClearEnum == cmd_clear_allbutlastskiptimes) {
 							 recent = record.skipTimes.back();
