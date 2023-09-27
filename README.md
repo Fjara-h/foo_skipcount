@@ -1,6 +1,6 @@
 # foo_skipcount
 
-Track skip statistics for foobar2000
+Track skip statistics for [foobar2000](https://www.foobar2000.org/), [official component page](https://www.foobar2000.org/components/view/foo_skipcount)
 
 The custom column pattern is %skip_count%, %last_skip%, %skip_times_raw%, and %skip_times_js%.
 
