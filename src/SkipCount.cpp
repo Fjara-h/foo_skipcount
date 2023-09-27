@@ -172,8 +172,6 @@ namespace foo_skipcount {
 		void on_playback_dynamic_info(const file_info& p_info) {}
 		void on_playback_dynamic_info_track(const file_info& p_info) {}
 		void on_playback_time(double p_time) {
-			//something baout this logic is wrong
-			FB2K_console_formatter() << protectionOffsetTime;
 			if(lastSkipControl != playback_control::track_command_default && protectionOffsetTime == 0) {
 				if(cfg_skipProtectionNext && lastSkipControl == playback_control::track_command_next && p_time >= cfg_skipProtectionNextTime) {
 					if(p_time < cfg_skipProtectionNextTime) {
