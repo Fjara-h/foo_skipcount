@@ -16,6 +16,9 @@ VALIDATE_COMPONENT_FILENAME("foo_skipcount.dll");
 // https://hydrogenaud.io/index.php/topic,124741.0.html
 // https://hydrogenaud.io/index.php/topic,124742.0.html
 
-//ToDo:skip-grace protection on all actions (leading edge time) with a modifiable duration of grace
-// merge clear last skip, allb ut recent, and all  function
-// rename to all, recent, all but recent
+// switch from seconds to ms?
+// handle what happens if the # of skipTimes overflows? or is it already handled without the get sets work
+//copy paste
+//write to tags
+//import from tags
+//export to xml

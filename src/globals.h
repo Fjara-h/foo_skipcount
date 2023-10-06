@@ -1,7 +1,7 @@
 #pragma once
 
 #define COMPONENT_NAME			"foo_skipcount"
-#define COMPONENT_VERSION		"1.9.0"
+#define COMPONENT_VERSION		"1.9.1"
 #define CURRENT_RECORD_VERSION  2
 
 // {592AAD05-29DB-4522-ACA2-AE44CE7B0BC4}
