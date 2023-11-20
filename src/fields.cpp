@@ -8,7 +8,6 @@
 #include "SkipCount.h"
 
 namespace foo_skipcount {
-
 	std::string t_uint64_to_string(t_uint64 value, bool jsTimestamp) {
 		if(jsTimestamp) {
 			return std::to_string(pfc::fileTimeWtoU(value) * 1000); // convert to unix timestamp, then add milliseconds for JS
@@ -205,19 +204,19 @@ namespace foo_skipcount {
 				}
 			}
 			else {
-				skipTimesStr = "N/A";
+				skipTimesStr = "";
 			}
 		}
 
-		p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Skipped", PFC_string_formatter() << skipCount << " times");
-		p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Next skipped", PFC_string_formatter() << nextCount << " times");
-		p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Random skipped", PFC_string_formatter() << randomCount << " times");
-		p_out.set_property(strPropertiesGroup, priorityBase + 0, PFC_string_formatter() << "Previous skipped", PFC_string_formatter() << previousCount << " times");
+		p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skipped", PFC_string_formatter() << skipCount << " times");
+		p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Next skipped", PFC_string_formatter() << nextCount << " times");
+		p_out.set_property(strPropertiesGroup, priorityBase + 3, PFC_string_formatter() << "Random skipped", PFC_string_formatter() << randomCount << " times");
+		p_out.set_property(strPropertiesGroup, priorityBase + 4, PFC_string_formatter() << "Previous skipped", PFC_string_formatter() << previousCount << " times");
 		if(skipTimesStr.length() > 0) {
-			p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Last skip", PFC_string_formatter() << foobar2000_io::format_filetimestamp(latestSkip));
-			p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimesStr);
-			p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Skip times raw", PFC_string_formatter() << skipTimesRawStr);
-			p_out.set_property(strPropertiesGroup, priorityBase + 3, PFC_string_formatter() << "Skip times JS", PFC_string_formatter() << skipTimesJSStr);
+			p_out.set_property(strPropertiesGroup, priorityBase + 5, PFC_string_formatter() << "Last skip", PFC_string_formatter() << foobar2000_io::format_filetimestamp(latestSkip));
+			p_out.set_property(strPropertiesGroup, priorityBase + 6, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimesStr);
+			p_out.set_property(strPropertiesGroup, priorityBase + 7, PFC_string_formatter() << "Skip times raw", PFC_string_formatter() << skipTimesRawStr);
+			p_out.set_property(strPropertiesGroup, priorityBase + 8, PFC_string_formatter() << "Skip times JS", PFC_string_formatter() << skipTimesJSStr);
 		}
 	}
 } // namespace foo_skipcount
