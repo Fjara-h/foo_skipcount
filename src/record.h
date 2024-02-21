@@ -69,11 +69,12 @@ namespace foo_skipcount {
 	static std::vector<t_filetimestamp> getRawSkipTimesFromString(const char* ch, std::string delimiter = AllDelimiterCharacters) {
 		std::vector<t_filetimestamp> skipTimes;
 		std::string str(ch);
-		char* tokenPtr;
-		tokenPtr = strtok(str.data(), delimiter.c_str());
-		while(tokenPtr != NULL) {
-			skipTimes.push_back(parseInt(tokenPtr));
-			tokenPtr = strtok(NULL, delimiter.c_str());
+		char* token = NULL;
+		char* nextTokenPtr = NULL;
+		token = strtok_s(str.data(), delimiter.c_str(), &nextTokenPtr);
+		while(token != NULL) {
+			skipTimes.push_back(parseInt(token));
+			token = strtok_s(NULL, delimiter.c_str(), &nextTokenPtr);
 		}
 		return skipTimes;
 	}

@@ -648,7 +648,7 @@ namespace foo_skipcount {
 				tmp += hash;
 			}
 
-			//metadb_io_v2::get()->update_info_async_simple(items, pfc::ptr_list_const_array_t<const file_info, file_info_impl*>(info.data(), info.size()), core_api::get_main_window(), metadb_io_v2::op_flag_delay_ui, nullptr);
+			metadb_io_v2::get()->update_info_async_simple(items, pfc::ptr_list_const_array_t<const file_info, file_info_impl*>(info.data(), info.size()), core_api::get_main_window(), metadb_io_v2::op_flag_delay_ui, nullptr);
 			pfc::list_t<metadb_index_hash> hashes;
 			for(metadb_index_hash hash : tmp) {
 				hashes += hash;
@@ -680,21 +680,21 @@ namespace foo_skipcount {
 				file_info_impl fileInfo = item->get_info_ref()->info();
 
 				if(fileInfo.meta_exists(tagMetaFieldString.at("next").c_str())) {
-					t_int num = parseInt(fileInfo.meta_get(tagMetaFieldString.at("next").c_str(), 0));
+					t_int num = static_cast<int>(parseInt(fileInfo.meta_get(tagMetaFieldString.at("next").c_str(), 0)));
 					if(num > 0) {
 						record.skipCountNext = num;
 						hasRecordChanged = true;
 					}
 				}
 				if(fileInfo.meta_exists(tagMetaFieldString.at("random").c_str())) {
-					t_int num = parseInt(fileInfo.meta_get(tagMetaFieldString.at("random").c_str(), 0));
+					t_int num = static_cast<int>(parseInt(fileInfo.meta_get(tagMetaFieldString.at("random").c_str(), 0)));
 					if(num > 0) {
 						record.skipCountRandom = num;
 						hasRecordChanged = true;
 					}
 				}
 				if(fileInfo.meta_exists(tagMetaFieldString.at("previous").c_str())) {
-					t_int num = parseInt(fileInfo.meta_get(tagMetaFieldString.at("previous").c_str(), 0));
+					t_int num = static_cast<int>(parseInt(fileInfo.meta_get(tagMetaFieldString.at("previous").c_str(), 0)));
 					if(num > 0) {
 						record.skipCountPrevious = num;
 						hasRecordChanged = true;
