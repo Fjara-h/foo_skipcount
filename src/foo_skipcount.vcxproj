@@ -81,13 +81,13 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath)</IncludePath>
+    <IncludePath>.\foobar2000-SDK;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath)</IncludePath>
+    <IncludePath>.\foobar2000-SDK;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -157,7 +157,7 @@ copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 V1.6\profile\user-componen
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 (x64)\profile\user-components\$(ProjectName)\"</Command>
+      <Command>copy /Y "$(TargetPath)" "$(TargetDir)..\..\..\foobar2000 (x64)\profile\user-components-x64\$(ProjectName)\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying to components directory</Message>
@@ -250,17 +250,21 @@ copy /Y "$(TargetPath)" "$(TargetDir)..\..\..\foobar2000 (x64)\profile\user-comp
     <ClCompile Include="fields.cpp" />
     <ClCompile Include="callbacks.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="record.cpp" />
     <ClCompile Include="SkipCount.cpp" />
     <ClCompile Include="preferences.cpp" />
+    <ClCompile Include="tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contextmenu.h" />
     <ClInclude Include="fields.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="preferences.h" />
+    <ClInclude Include="record.h" />
     <ClInclude Include="SkipCount.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\foobar2000-SDK\foobar2000\helpers\foobar2000_sdk_helpers.vcxproj">
@@ -280,10 +284,10 @@ copy /Y "$(TargetPath)" "$(TargetDir)..\..\..\foobar2000 (x64)\profile\user-comp
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ResourceCompile Include="foo_skipcount.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="foo_skipcount.rc" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

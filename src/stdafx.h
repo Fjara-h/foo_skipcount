@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SKIPCOUNT_STDAFX_H
+#define SKIPCOUNT_STDAFX_H
 
 #define _WIN32_WINNT _WIN32_WINNT_WIN7
 #define WINVER _WIN32_WINNT_WIN7
@@ -10,3 +11,4 @@
 #ifdef __OBJC__
 #include <Cocoa/Cocoa.h>
 #endif
+#endif // SKIPCOUNT_STDAFX_H

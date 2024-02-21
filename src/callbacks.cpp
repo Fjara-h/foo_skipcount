@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "SkipCount.h"
 
 namespace foo_skipcount {
@@ -12,6 +11,7 @@ namespace foo_skipcount {
 	class my_initquit : public initquit {
 	public:
 		inline void on_init() final {
+			theAPI();
 			FB2K_console_formatter() << COMPONENT_NAME ": loaded";
 		}
 		inline void on_quit() final {
@@ -24,8 +24,11 @@ namespace foo_skipcount {
 	public:
 		void on_init_stage(t_uint32 stage) {
 			switch(stage) {
-				case init_stages::before_config_read:
+				case init_stages::before_config_read: {
 					addMetadbIndexes();
+					break;
+				}
+				default:
 					break;
 			}
 		}

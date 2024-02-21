@@ -1,8 +1,17 @@
-
-foobar2000-SDK/
-foobar2000 V1.6/
-foobar2000 (x86)/
+!component/
 foobar2000 (x64)/
+!foobar2000 (x64).profile.user-components-x64/foo_skipcount/
+foobar2000 (x86)/
+!foobar2000 (x86)/profile/user-components/foo_skipcount/
+foobar2000 V1.6/
+!foobar2000 V1.6/components/foo_skipcount.dll
+foobar2000 V1.6/
+foobar2000-SDK/
+!foobar2000-SDK\foobar2000\foobar2000_component_client/foobar2000_component_client.vcxproj
+!foobar2000-SDK\foobar2000\helpers/foobar2000_sdk_helpers.vcxproj
+!foobar2000-SDK\foobar2000\SDK\foobar2000_SDK.vcxproj
+!foobar2000-SDK\libPPUI/libPPUI.vcxproj
+!foobar2000-SDK\pfc/pfc.vcxproj
 pdbs/
 src/.vs/
 src/packages/
@@ -11,6 +20,4 @@ src/Release/
 src/Release FB2K/
 src/Debug/
 src/Debug FB2K/
-component/foo_skipcount.dll
-component/x64/foo_skipcount.dll
 src/foo_skipcount.vcxproj.user
