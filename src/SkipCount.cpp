@@ -86,12 +86,13 @@ namespace foo_skipcount {
 				metadb_index_hash hashNew = client->transform(*after[t], make_playable_location(items[t]->get_path(), items[t]->get_subsong_index()));
 				if(hashOld != hashNew) {
 					record_t oldRecord = getRecord(hashOld);
-					uint32_t oldSkipCount = oldRecord.skipCountNext + oldRecord.skipCountRandom + oldRecord.skipCountPrevious;
+					uint32_t oldSkipCount = oldRecord.skipCountNext + oldRecord.skipCountRandom + oldRecord.skipCountPrevious + oldRecord.skipCountDoubleClick;
 					if(oldSkipCount > 0 || !oldRecord.skipTimes.empty()) {
 						record_t newRecord = getRecord(hashNew);
-						newRecord.skipCountNext = newRecord.skipCountNext + oldRecord.skipCountNext;
-						newRecord.skipCountRandom = newRecord.skipCountRandom + oldRecord.skipCountRandom;
-						newRecord.skipCountPrevious = newRecord.skipCountPrevious + oldRecord.skipCountPrevious;
+						newRecord.skipCountNext += oldRecord.skipCountNext;
+						newRecord.skipCountRandom += oldRecord.skipCountRandom;
+						newRecord.skipCountPrevious += oldRecord.skipCountPrevious;
+						newRecord.skipCountDoubleClick += oldRecord.skipCountDoubleClick;
 
 						if(newRecord.skipTimes.size() == 0) {
 							newRecord.skipTimes = oldRecord.skipTimes;
@@ -125,6 +126,7 @@ namespace foo_skipcount {
 			record.skipCountNext += (control == playback_control::t_track_command::track_command_next);
 			record.skipCountRandom += (control == playback_control::t_track_command::track_command_rand);
 			record.skipCountPrevious += (control == playback_control::t_track_command::track_command_prev);
+			record.skipCountDoubleClick += (control == playback_control::t_track_command::track_command_settrack);
 			t_filetimestamp time = filetimestamp_from_system_timer();
 			switch(cfg_logSkipTimes) {
 				case LOGTYPE_NONE:
@@ -168,6 +170,9 @@ namespace foo_skipcount {
 			else if(cfg_skipProtectionPrevious && lastSkipCommand == playback_control::track_command_prev) {
 				protectionOffsetTime = cfg_skipProtectionPreviousTime;
 			}
+			else if(cfg_skipProtectionDoubleClick && lastSkipCommand == playback_control::track_command_settrack) {
+				protectionOffsetTime = cfg_skipProtectionDoubleClickTime;
+			}
 			else {
 				protectionOffsetTime = 0;
 			}
@@ -176,7 +181,8 @@ namespace foo_skipcount {
 		void my_play_callback::on_playback_starting(play_control::t_track_command p_command, bool) {
 			if((cfg_countNext && p_command == playback_control::track_command_next) ||
 			   (cfg_countRandom && p_command == playback_control::track_command_rand) ||
-			   (cfg_countPrevious && p_command == playback_control::track_command_prev)) {
+			   (cfg_countPrevious && p_command == playback_control::track_command_prev) ||
+			   (cfg_countDoubleClick && p_command == playback_control::track_command_settrack))  {
 				lastSkipCommand = p_command;
 			}
 			else {

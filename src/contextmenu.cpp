@@ -141,12 +141,13 @@ namespace foo_skipcount {
 
 				switch(contextClearEnum) {
 					case CMD_CLEAR_SKIPCOUNT: {
-						if(record.skipCountNext == 0 && record.skipCountRandom == 0 && record.skipCountPrevious == 0) {
+						if(record.skipCountNext == 0 && record.skipCountRandom == 0 && record.skipCountPrevious == 0 && record.skipCountDoubleClick == 0) {
 							break;
 						}
 						record.skipCountNext = 0;
 						record.skipCountRandom = 0;
 						record.skipCountPrevious = 0;
+						record.skipCountDoubleClick = 0;
 						setRecord(hash, record);
 						tmp += hash;
 						break;
@@ -377,6 +378,7 @@ namespace foo_skipcount {
 				bool pasteNext = cfg_pasteNextCount;
 				bool pasteRandom = cfg_pasteRandomCount;
 				bool pastePrevious = cfg_pastePreviousCount;
+				bool pasteDoubleClick = cfg_pastePreviousCount;
 				uint32_t pasteSkips = cfg_pasteSkipSelection;
 						
 				if(!cfg_pasteDisableDialog) {
@@ -388,6 +390,7 @@ namespace foo_skipcount {
 					pasteNext = (options & PASTE_NEXTCOUNT);
 					pasteRandom = (options & PASTE_RANDOMCOUNT);
 					pastePrevious = (options & PASTE_PREVIOUSCOUNT);
+					pasteDoubleClick = (options & PASTE_DOUBLECLICKCOUNT);
 					if(options & PASTE_ALLSKIPS) {
 						pasteSkips = PASTESKIP_ALL;
 					}
@@ -411,7 +414,7 @@ namespace foo_skipcount {
 					}
 				}
 
-				if(!pasteNext && !pasteRandom && !pastePrevious && pasteSkips == PASTESKIP_NONE) {
+				if(!pasteNext && !pasteRandom && !pastePrevious && !pasteDoubleClick && pasteSkips == PASTESKIP_NONE) {
 					return;
 				}
 
@@ -472,6 +475,10 @@ namespace foo_skipcount {
 					if(pastePrevious) {
 						recordWrite.skipCountPrevious = recordCopy.skipCountPrevious;
 						msg += writeMsg ? (" Previous skips: " + std::to_string(recordWrite.skipCountPrevious)) : "";
+					}
+					if(pasteDoubleClick) {
+						recordWrite.skipCountDoubleClick = recordCopy.skipCountDoubleClick;
+						msg += writeMsg ? (" Double Click skips: " + std::to_string(recordWrite.skipCountDoubleClick)) : "";
 					}
 					if(recordCopy.version > 1) {
 						if(pasteSkips == PASTESKIP_ALL) {
@@ -579,6 +586,7 @@ namespace foo_skipcount {
 			bool tagNext = cfg_tagNextCount;
 			bool tagRandom = cfg_tagRandomCount;
 			bool tagPrevious = cfg_tagPreviousCount;
+			bool tagDoubleClick = cfg_tagDoubleClickCount;
 			bool tagCurrentTimestamp = cfg_tagCurrentTimestamp;
 			bool tagAllTimestampsRaw = cfg_tagAllTimestampsRaw;
 			uint32_t tagDelimiter = cfg_tagTimestampDelimiter;
@@ -592,6 +600,7 @@ namespace foo_skipcount {
 				tagNext = (options & TAG_NEXTCOUNT);
 				tagRandom = (options & TAG_RANDOMCOUNT);
 				tagPrevious = (options & TAG_PREVIOUSCOUNT);
+				tagDoubleClick = (options & TAG_DOUBLECLICKCOUNT);
 				tagCurrentTimestamp = (options & TAG_CURRENTTIME);
 				tagAllTimestampsRaw = (options & TAG_ALLSKIPS);
 				if(options & TAG_DELIMIT_SEMICOLON) {
@@ -638,6 +647,9 @@ namespace foo_skipcount {
 				}
 				if(tagPrevious) {
 					info[i].meta_set(tagMetaFieldString.at("previous").c_str(), std::to_string(record.skipCountPrevious).c_str());
+				}
+				if(tagDoubleClick) {
+					info[i].meta_set(tagMetaFieldString.at("doubleclick").c_str(), std::to_string(record.skipCountDoubleClick).c_str());
 				}
 				if(tagCurrentTimestamp) {
 					info[i].meta_set(tagMetaFieldString.at("current").c_str(), std::to_string(getLocalTimestamp(filetimestamp_from_system_timer(), false)).c_str());
@@ -697,6 +709,13 @@ namespace foo_skipcount {
 					t_int num = static_cast<int>(parseInt(fileInfo.meta_get(tagMetaFieldString.at("previous").c_str(), 0)));
 					if(num > 0) {
 						record.skipCountPrevious = num;
+						hasRecordChanged = true;
+					}
+				}
+				if(fileInfo.meta_exists(tagMetaFieldString.at("doubleclick").c_str())) {
+					t_int num = static_cast<int>(parseInt(fileInfo.meta_get(tagMetaFieldString.at("doubleclick").c_str(), 0)));
+					if(num > 0) {
+						record.skipCountDoubleClick = num;
 						hasRecordChanged = true;
 					}
 				}

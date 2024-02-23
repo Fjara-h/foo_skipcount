@@ -26,6 +26,9 @@ namespace foo_skipcount {
 			case FIELD_OLDEST_SKIP:
 				out = "oldest_skip";
 				break;
+			case FIELD_SKIP_TIMES:
+				out = "skip_times";
+				break;
 			case FIELD_SKIP_TIMES_JS:
 				out = "skip_times_js";
 				break;
@@ -61,13 +64,14 @@ namespace foo_skipcount {
 				}
 				break;
 			}
+			case FIELD_SKIP_TIMES:
 			case FIELD_SKIP_TIMES_JS: 
 			case FIELD_SKIP_TIMES_RAW: {
 				if(record.skipTimes.empty()) {
 					out->write(titleformat_inputtypes::meta, "[]");
 				}
 				else {
-					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), false).c_str());
+					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), (index == FIELD_SKIP_TIMES)).c_str());
 				}
 				break;
 			}
@@ -90,7 +94,7 @@ namespace foo_skipcount {
 			return;
 		}
 
-		t_uint skipCount = 0, nextCount = 0, randomCount = 0, previousCount = 0;
+		t_uint skipCount = 0, nextCount = 0, randomCount = 0, previousCount = 0, doubleClickCount = 0;
 		pfc::stringLite skipTimesStr = "", skipTimesRawStr = "", skipTimesJSStr = "", latestSkipStr = "", oldestSkipStr = "";
 		t_filetimestamp latestSkip = filetimestamp_invalid, oldestSkip = UINTPTR_MAX;
 
@@ -101,10 +105,11 @@ namespace foo_skipcount {
 				firstRecord = record;
 			}
 
-			skipCount += record.skipCountNext + record.skipCountRandom + record.skipCountPrevious;
+			skipCount += record.skipCountNext + record.skipCountRandom + record.skipCountPrevious + record.skipCountDoubleClick;
 			nextCount += record.skipCountNext;
 			randomCount += record.skipCountRandom;
 			previousCount += record.skipCountPrevious;
+			doubleClickCount += record.skipCountDoubleClick;
 			if(!record.skipTimes.empty()) {
 				if(oldestSkip > record.skipTimes.front()) {
 					oldestSkip = record.skipTimes.front();
@@ -141,12 +146,13 @@ namespace foo_skipcount {
 		p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Next skipped", PFC_string_formatter() << nextCount << " times");
 		p_out.set_property(strPropertiesGroup, priorityBase + 3, PFC_string_formatter() << "Random skipped", PFC_string_formatter() << randomCount << " times");
 		p_out.set_property(strPropertiesGroup, priorityBase + 4, PFC_string_formatter() << "Previous skipped", PFC_string_formatter() << previousCount << " times");
+		p_out.set_property(strPropertiesGroup, priorityBase + 5, PFC_string_formatter() << "Double Click skipped", PFC_string_formatter() << doubleClickCount << " times");
 		if(!skipTimesStr.isEmpty()) {
-			p_out.set_property(strPropertiesGroup, priorityBase + 5, PFC_string_formatter() << "Latest skip", PFC_string_formatter() << latestSkipStr);
-			p_out.set_property(strPropertiesGroup, priorityBase + 6, PFC_string_formatter() << "Oldest skip", PFC_string_formatter() << oldestSkipStr);
-			p_out.set_property(strPropertiesGroup, priorityBase + 7, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimesStr);
-			p_out.set_property(strPropertiesGroup, priorityBase + 8, PFC_string_formatter() << "Skip times raw", PFC_string_formatter() << skipTimesRawStr);
-			p_out.set_property(strPropertiesGroup, priorityBase + 9, PFC_string_formatter() << "Skip times JS", PFC_string_formatter() << skipTimesJSStr);
+			p_out.set_property(strPropertiesGroup, priorityBase + 6, PFC_string_formatter() << "Latest skip", PFC_string_formatter() << latestSkipStr);
+			p_out.set_property(strPropertiesGroup, priorityBase + 7, PFC_string_formatter() << "Oldest skip", PFC_string_formatter() << oldestSkipStr);
+			p_out.set_property(strPropertiesGroup, priorityBase + 8, PFC_string_formatter() << "Skip times", PFC_string_formatter() << skipTimesStr);
+			p_out.set_property(strPropertiesGroup, priorityBase + 9, PFC_string_formatter() << "Skip times raw", PFC_string_formatter() << skipTimesRawStr);
+			p_out.set_property(strPropertiesGroup, priorityBase + 10, PFC_string_formatter() << "Skip times JS", PFC_string_formatter() << skipTimesJSStr);
 		}
 	}
 } // namespace foo_skipcount

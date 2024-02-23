@@ -14,6 +14,7 @@ namespace foo_skipcount {
 		t_uint skipCountNext = 0;
 		t_uint skipCountRandom = 0;
 		t_uint skipCountPrevious = 0;
+		t_uint skipCountDoubleClick = 0;
 		t_uint skipTimesCounter = 0; // Used ONLY for size in getRecord. Use skiptimes.size() instead.
 		std::vector<t_filetimestamp> skipTimes;
 	};

@@ -62,13 +62,14 @@ namespace foo_skipcount {
 		PASTE_NEXTCOUNT = 1 << 0,
 		PASTE_RANDOMCOUNT = 1 << 1,
 		PASTE_PREVIOUSCOUNT = 1 << 2,
-		PASTE_ALLSKIPS = 1 << 3,
-		PASTE_NOSKIPS = 1 << 4,
-		PASTE_LATESTSKIP = 1 << 5,
-		PASTE_OLDESTSKIP = 1 << 6,
-		PASTE_ALLBUTOLDESTSKIP = 1 << 7,
-		PASTE_ALLBUTLATESTSKIP = 1 << 8,
-		PASTE_LATESTANDOLDESTSKIP = 1 << 9
+		PASTE_DOUBLECLICKCOUNT = 1 << 3,
+		PASTE_ALLSKIPS = 1 << 4,
+		PASTE_NOSKIPS = 1 << 5,
+		PASTE_LATESTSKIP = 1 << 6,
+		PASTE_OLDESTSKIP = 1 << 7,
+		PASTE_ALLBUTOLDESTSKIP = 1 << 8,
+		PASTE_ALLBUTLATESTSKIP = 1 << 9,
+		PASTE_LATESTANDOLDESTSKIP = 1 << 10
 	};
 
 	// Tag timestamp delimiter
@@ -106,21 +107,23 @@ namespace foo_skipcount {
 		TAG_NEXTCOUNT = 1 << 0,
 		TAG_RANDOMCOUNT = 1 << 1,
 		TAG_PREVIOUSCOUNT = 1 << 2,
-		TAG_CURRENTTIME = 1 << 3,
-		TAG_ALLSKIPS = 1 << 4,
-		TAG_DELIMIT_SEMICOLON = 1 << 5,
-		TAG_DELIMIT_COMMA = 1 << 6,
-		TAG_DELIMIT_FORWARDSLASH = 1 << 7,
-		TAG_DELIMIT_SPACE = 1 << 8,
-		TAG_DELIMIT_COLON = 1 << 9,
-		TAG_DELIMIT_PIPE = 1 << 10,
-		TAG_DELIMIT_AMPERSAND = 1 << 11,
+		TAG_DOUBLECLICKCOUNT = 1 << 3,
+		TAG_CURRENTTIME = 1 << 4,
+		TAG_ALLSKIPS = 1 << 5,
+		TAG_DELIMIT_SEMICOLON = 1 << 6,
+		TAG_DELIMIT_COMMA = 1 << 7,
+		TAG_DELIMIT_FORWARDSLASH = 1 << 8,
+		TAG_DELIMIT_SPACE = 1 << 9,
+		TAG_DELIMIT_COLON = 1 << 10,
+		TAG_DELIMIT_PIPE = 1 << 11,
+		TAG_DELIMIT_AMPERSAND = 1 << 12,
 	};
 
 	static const std::unordered_map<std::string, std::string> tagMetaFieldString = {
 		{ "next", "SKIP_COUNT_NEXT" },
 		{ "random", "SKIP_COUNT_RANDOM" },
 		{ "previous", "SKIP_COUNT_PREVIOUS" },
+		{ "doubleclick", "SKIP_COUNT_DOUBLECLICK" },
 		{ "current", "SKIP_COUNT_TAG_TIMESTAMP" },
 		{ "times", "SKIP_TIMESTAMPS_RAW" }
 	};
@@ -133,16 +136,18 @@ namespace foo_skipcount {
 		EXPORT_NEXTCOUNT = 1 << 3,
 		EXPORT_RANDOMCOUNT = 1 << 4,
 		EXPORT_PREVIOUSCOUNT = 1 << 5,
-		EXPORT_LATESTSKIP = 1 << 6,
-		EXPORT_OLDESTSKIP = 1 << 7,
-		EXPORT_TIMESTAMPCOUNT = 1 << 8,
-		EXPORT_ALLSKIPS = 1 << 9,
+		EXPORT_DOUBLECLICKCOUNT = 1 << 6,
+		EXPORT_LATESTSKIP = 1 << 7,
+		EXPORT_OLDESTSKIP = 1 << 8,
+		EXPORT_TIMESTAMPCOUNT = 1 << 9,
+		EXPORT_ALLSKIPS = 1 << 10,
 	};
 
 	static const std::unordered_map<t_uint, std::array<std::wstring, 2>> ToolTipStrings = {
 		{ IDC_COUNT_NEXT, { L"Next Song command increments skip count", L"Using a next song button or shortcut before the conditions are met will count as a skip." } },
 		{ IDC_COUNT_RANDOM, { L"Random Song command increments skip count", L"Using a random song button or shortcut before the conditions are met will count as a skip." } },
 		{ IDC_COUNT_PREVIOUS, { L"Previous Song command increments skip count", L"Using a previous song button or shortcut before the conditions are met will count as a skip." } },
+		{ IDC_COUNT_DOUBLECLICK, { L"Manually playing a track by double click increments skip count", L"Double clicking on a new track to start it before the conditions are met will count as a skip." } },
 		{ IDC_COUNT_FROM_STOP, { L"Count skips when using commands after stopping playback", L"Commands used after the user has manually stopped playback can increment skips." } },
 		{ IDC_COUNT_FROM_PAUSE, { L"Count skips when using commands after pausing playback", L"Commands used after the user has manually paused playback can increment skips." } },
 		{ IDC_CONDITION, { L"Condition when skips are no longer counted", L"'Time' counts skips before the seconds set. 'Percentage' counts skips before the percentage of the track has played. 'Time and Percent' requires both conditions to be met before skips are no longer tracked." } },
@@ -153,10 +158,12 @@ namespace foo_skipcount {
 		{ IDC_PROTECTION_NEXT, { L"Offset when skips can increment with next song commands", L"Using a Next Song command before the defined time will not increase the skip count. The duration into the track where a skip counts will be shifted by the defined time." } },
 		{ IDC_PROTECTION_RANDOM, { L"Offset when skips can increment with random song commands", L"Using a Random Song command before the defined time will not increase the skip count. The duration into the track where a skip counts will be shifted by the defined time." } },
 		{ IDC_PROTECTION_PREVIOUS, { L"Offset when skips can increment with previous song commands", L"Using a Previous Song command before the defined time will not increase the skip count. The duration into the track where a skip counts will be shifted by the defined time." } },
+		{ IDC_PROTECTION_DOUBLECLICK, { L"Offset when skips can increment after double clicking a new track", L"Double clicking a new song before the defined time will not increase the skip count. The duration into the track where a skip counts will be shifted by the defined time." } },
 		{ IDC_PASTE_DISABLE_DIALOG, { L"Disable the paste setting dialog pop up when pasting skip statistics", L"When disabled the settings in the preferences page are automatically used." } },
 		{ IDC_PASTE_NEXT_COUNT, { L"Paste the copied 'Next' skip count", L"" } },
 		{ IDC_PASTE_RANDOM_COUNT, { L"Paste the copied 'Random' skip count", L"" } },
 		{ IDC_PASTE_PREVIOUS_COUNT, { L"Paste the copied 'Previous' skip count", L"" } },
+		{ IDC_PASTE_DOUBLECLICK_COUNT, { L"Paste the copied 'Double Click' skip count", L"" } },
 		{ IDC_PASTE_SKIP_SELECTION, { L"Selection of skip timestamps to paste", L"'All', 'None', only the 'Latest', only the 'Oldest', 'All but oldest', 'All but latest', only the 'Latest and Oldest'." } },
 		{ IDC_XML_DISABLE_DIALOG, { L"Disable the xml setting dialog pop up when exporting to xml", L"When disabled the settings in the preferences page are automatically used." } },
 		{ IDC_XML_EXPORT_JS_TIMESTAMP, { L"Export javascript-style timestamps", L"By default, timestamps are exported as Unix epoch timestamps." } },
@@ -164,6 +171,7 @@ namespace foo_skipcount {
 		{ IDC_XML_EXPORT_NEXT_COUNT, { L"Export the 'Next' skip count as an attribute", L"" } },
 		{ IDC_XML_EXPORT_RANDOM_COUNT, { L"Export the 'Random' skip count as an attribute", L"" } },
 		{ IDC_XML_EXPORT_PREVIOUS_COUNT, { L"Export the 'Previous' skip count as an attribute", L"" } },
+		{ IDC_XML_EXPORT_DOUBLECLICK_COUNT, { L"Export the 'Double Click' skip count as an attribute", L"" } },
 		{ IDC_XML_EXPORT_TOTAL_COUNT, { L"Export the sum of all 3 skip counts as an attribute", L"" } },
 		{ IDC_XML_EXPORT_LATEST_SKIP, { L"Export the most recent skip timestamp as an attribute", L"" } },
 		{ IDC_XML_EXPORT_OLDEST_SKIP, { L"Export the oldest skip timestamp as an attribute", L"" } },
@@ -173,6 +181,7 @@ namespace foo_skipcount {
 		{ IDC_TAG_NEXT_COUNT, { L"Write the 'Next' skip count as a tag", L"" } },
 		{ IDC_TAG_RANDOM_COUNT, { L"Write the 'Random' skip count as a tag", L"" } },
 		{ IDC_TAG_PREVIOUS_COUNT, { L"Write the 'Previous' skip count as a tag", L"" } },
+		{ IDC_TAG_DOUBLECLICK_COUNT, { L"Write the 'Double Click' skip count as a tag", L"" } },
 		{ IDC_TAG_CURRENT_TIMESTAMP, { L"Write the current time timestamp as a tag", L"Used to track when the statistics were written." } },
 		{ IDC_TAG_ALL_TIMESTAMPS_RAW, { L"Write all skip timestamps as a tag", L"WARNING: This could increase filesize and be very resource intensive." } },
 		{ IDC_TAG_TIMESTAMP_DELIMITER, { L"Choose the delimiter between timestamps in the tag", L"The characters between the quotation marks, including spaces, is used." } },
@@ -185,6 +194,8 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_countRandom = { 0x30d15ac1, 0xc56b, 0x40db, { 0x88, 0xb2, 0x9b, 0x0c, 0x0c, 0x1c, 0x8b, 0x17 } };
 	// {1AA63FCC-223A-4732-B778-1F94A0C0B91F}
 	static constexpr GUID guid_cfg_countPrevious = { 0x1aa63fcc, 0x223a, 0x4732, { 0xb7, 0x78, 0x1f, 0x94, 0xa0, 0xc0, 0xb9, 0x1f } };
+	// {62DF23D0-B1DF-4E50-A599-7D7861F796E9}
+	static constexpr GUID guid_cfg_countDoubleClick = { 0x62df23d0, 0xb1df, 0x4e50, { 0xa5, 0x99, 0x7d, 0x78, 0x61, 0xf7, 0x96, 0xe9 } };
 	// {9C746A7C-24DF-450A-BEBF-F63F14C6BF57}
 	static constexpr GUID guid_cfg_countFromStop = { 0x9c746a7c, 0x24df, 0x450a, { 0xbe, 0xbf, 0xf6, 0x3f, 0x14, 0xc6, 0xbf, 0x57 } };
 	// {C2A71EB9-E63D-433B-84CF-0BE30DFD47B0}
@@ -213,6 +224,10 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_skipProtectionPrevious = { 0xe958ac28, 0x1626, 0x422f, { 0xb0, 0xf0, 0x35, 0x62, 0x23, 0xdc, 0x7e, 0xdb } };
 	// {8B16D08D-9169-4F1C-9102-E058DA09185C}
 	static constexpr GUID guid_cfg_skipProtectionPreviousTime = { 0x8b16d08d, 0x9169, 0x4f1c, { 0x91, 0x02, 0xe0, 0x58, 0xda, 0x09, 0x18, 0x5c } };
+	// {E8968E6F-A8AA-4215-8598-BE4E118D47B5} {E8968E6F-A8AA-4215-8598-BE4E118D47B5}
+	static constexpr GUID guid_cfg_skipProtectionDoubleClick = { 0xe958ac28, 0x1626, 0x422f, { 0xb0, 0xf0, 0x35, 0x62, 0x23, 0xdc, 0x7e, 0xdb } };
+	// {D7F03638-FFF0-45FB-B507-D5FC4BEAF06D} {d7f03638-fff0-45fb-b507-d5fc4beaf06d}
+	static constexpr GUID guid_cfg_skipProtectionDoubleClickTime = { 0x8b16d08d, 0x9169, 0x4f1c, { 0x91, 0x02, 0xe0, 0x58, 0xda, 0x09, 0x18, 0x5c } };
 	// {49485545-EA16-4376-915F-4FED4C1500AA}
 	static constexpr GUID guid_cfg_pasteDisableDialog = { 0x49485545, 0xea16, 0x4376, { 0x91, 0x5f, 0x4f, 0xed, 0x4c, 0x15, 0x00, 0xaa } };
 	// {B7D7E16A-4CA2-428E-9D45-85159276532E}
@@ -221,6 +236,8 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_pasteRandomCount = { 0x522c912e, 0xa61e, 0x4e7b, { 0x82, 0xd2, 0xde, 0x6d, 0x11, 0x54, 0x70, 0x9b } };
 	// {6227173B-BEE7-4A59-A4B0-DD38ED47EB0D}
 	static constexpr GUID guid_cfg_pastePreviousCount = { 0x6227173b, 0xbee7, 0x4a59, { 0xa4, 0xb0, 0xdd, 0x38, 0xed, 0x47, 0xeb, 0x0d } };
+	// {C1357C9A-94FE-4DC2-8396-34805682D5D8} {c1357c9a-94fe-4dc2-8396-34805682d5d8}
+	static constexpr GUID guid_cfg_pasteDoubleClickCount = { 0x6227173b, 0xbee7, 0x4a59, { 0xa4, 0xb0, 0xdd, 0x38, 0xed, 0x47, 0xeb, 0x0d } };
 	// {ADA6BE04-0406-4895-B0C3-83E46A1A71EC}
 	static constexpr GUID guid_cfg_pasteSkipSelection = { 0xada6be04, 0x0406, 0x4895, { 0xb0, 0xc3, 0x83, 0xe4, 0x6a, 0x1a, 0x71, 0xec } };
 	// {08B179BC-9E34-4689-B568-DD94DC41F16C}
@@ -235,6 +252,8 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_xmlExportRandomCount = { 0x83e37962, 0x3944, 0x4e86, { 0xa7, 0xb1, 0x9f, 0x86, 0x93, 0xfa, 0xba, 0x8b } };
 	// {275A0A28-E11C-41E5-BC1A-E3C472656590}
 	static constexpr GUID guid_cfg_xmlExportPreviousCount = { 0x275a0a28, 0xe11c, 0x41e5, { 0xbc, 0x1a, 0xe3, 0xc4, 0x72, 0x65, 0x65, 0x90 } };
+	// {51EB7FBC-B0D6-4E40-A259-B4462D589A02} {51eb7fbc-b0d6-4e40-a259-b4462d589a02}
+	static constexpr GUID guid_cfg_xmlExportDoubleClickCount = { 0x275a0a28, 0xe11c, 0x41e5, { 0xbc, 0x1a, 0xe3, 0xc4, 0x72, 0x65, 0x65, 0x90 } };
 	// {C9F94630-A34C-4EA9-86F6-D4B992D7CD6D}
 	static constexpr GUID guid_cfg_xmlExportTotalCount = { 0xc9f94630, 0xa34c, 0x4ea9, { 0x86, 0xf6, 0xd4, 0xb9, 0x92, 0xd7, 0xcd, 0x6d } };
 	// {2BEA4ACF-87E5-48F1-879F-A3619A59722A}
@@ -253,6 +272,8 @@ namespace foo_skipcount {
 	static constexpr GUID guid_cfg_tagRandomCount = { 0x399592ac, 0xfdf6, 0x48d9, { 0x81, 0x20, 0x00, 0xf9, 0x8a, 0xfc, 0xa3, 0x3b } };
 	// {4BA40669-96E4-4BE6-9455-B9B957825E4F}
 	static constexpr GUID guid_cfg_tagPreviousCount = { 0x4ba40669, 0x96e4, 0x4be6, { 0x94, 0x55, 0xb9, 0xb9, 0x57, 0x82, 0x5e, 0x4f } };
+	// {333218BD-F6D6-4220-B636-5E89BDD04A8B} {333218bd-f6d6-4220-b636-5e89bdd04a8b}
+	static constexpr GUID guid_cfg_tagDoubleClickCount = { 0x4ba40669, 0x96e4, 0x4be6, { 0x94, 0x55, 0xb9, 0xb9, 0x57, 0x82, 0x5e, 0x4f } };
 	// {09C4DD56-4FC2-4543-883D-016467A114CB}
 	static constexpr GUID guid_cfg_tagCurrentTimestamp = { 0x09c4dd56, 0x4fc2, 0x4543, { 0x88, 0x3d, 0x01, 0x64, 0x67, 0xa1, 0x14, 0xcb } };
 	// {DF44C5ED-4502-47E9-B854-CD9097895546}
@@ -264,22 +285,26 @@ namespace foo_skipcount {
 	extern cfg_bool cfg_countNext,
 		cfg_countRandom,
 		cfg_countPrevious,
+		cfg_countDoubleClick,
 		cfg_countFromStop,
 		cfg_countFromPause,
 		cfg_confirmContextClear,
 		cfg_skipProtectionNext,
 		cfg_skipProtectionRandom,
 		cfg_skipProtectionPrevious,
+		cfg_skipProtectionDoubleClick,
 		cfg_pasteDisableDialog,
 		cfg_pasteNextCount,
 		cfg_pasteRandomCount,
 		cfg_pastePreviousCount,
+		cfg_pasteDoubleClickCount,
 		cfg_xmlDisableDialog,
 		cfg_xmlExportJSTimestamp,
 		cfg_xmlExportDateTime,
 		cfg_xmlExportNextCount,
 		cfg_xmlExportRandomCount,
 		cfg_xmlExportPreviousCount,
+		cfg_xmlExportDoubleClickCount,
 		cfg_xmlExportTotalCount,
 		cfg_xmlExportLatestSkip,
 		cfg_xmlExportOldestSkip,
@@ -289,6 +314,7 @@ namespace foo_skipcount {
 		cfg_tagNextCount,
 		cfg_tagRandomCount,
 		cfg_tagPreviousCount,
+		cfg_tagDoubleClickCount,
 		cfg_tagCurrentTimestamp,
 		cfg_tagAllTimestampsRaw;
 
@@ -299,6 +325,7 @@ namespace foo_skipcount {
 		cfg_skipProtectionNextTime,
 		cfg_skipProtectionRandomTime,
 		cfg_skipProtectionPreviousTime,
+		cfg_skipProtectionDoubleClickTime,
 		cfg_pasteSkipSelection,
 		cfg_tagTimestampDelimiter;
 
@@ -306,22 +333,26 @@ namespace foo_skipcount {
 	static const bool default_cfg_countNext = false,
 		default_cfg_countRandom = false,
 		default_cfg_countPrevious = true,
+		default_cfg_countDoubleClick = false,
 		default_cfg_countFromStop = false,
 		default_cfg_countFromPause = true,
 		default_cfg_confirmContextClear = false,
 		default_cfg_skipProtectionNext = false,
 		default_cfg_skipProtectionRandom = false,
 		default_cfg_skipProtectionPrevious = true,
+		default_cfg_skipProtectionDoubleClick = false,
 		default_cfg_pasteDisableDialog = false,
 		default_cfg_pasteNextCount = true,
 		default_cfg_pasteRandomCount = true,
 		default_cfg_pastePreviousCount = true,
+		default_cfg_pasteDoubleClickCount = true,
 		default_cfg_xmlDisableDialog = false,
 		default_cfg_xmlExportJSTimestamp = false,
 		default_cfg_xmlExportDateTime = false,
 		default_cfg_xmlExportNextCount = true,
 		default_cfg_xmlExportRandomCount = true,
 		default_cfg_xmlExportPreviousCount = true,
+		default_cfg_xmlExportDoubleClickCount = true,
 		default_cfg_xmlExportTotalCount = true,
 		default_cfg_xmlExportLatestSkip = true,
 		default_cfg_xmlExportOldestSkip = true,
@@ -331,6 +362,7 @@ namespace foo_skipcount {
 		default_cfg_tagNextCount = true,
 		default_cfg_tagRandomCount = true,
 		default_cfg_tagPreviousCount = true,
+		default_cfg_tagDoubleClickCount = true,
 		default_cfg_tagCurrentTimestamp = true,
 		default_cfg_tagAllTimestampsRaw = false;
 
@@ -341,6 +373,7 @@ namespace foo_skipcount {
 		default_cfg_skipProtectionNextTime = 1,
 		default_cfg_skipProtectionRandomTime = 1,
 		default_cfg_skipProtectionPreviousTime = 1,
+		default_cfg_skipProtectionDoubleClickTime = 1,
 		default_cfg_pasteSkipSelection = 0,
 		default_cfg_tagTimestampDelimiter = 0;
 
@@ -351,6 +384,7 @@ namespace foo_skipcount {
 		{ IDC_PROTECTION_NEXT_TIME, { 0, default_cfg_skipProtectionNextTime, 999999999, default_cfg_skipProtectionNextTime } },
 		{ IDC_PROTECTION_RANDOM_TIME, { 0, default_cfg_skipProtectionRandomTime, 999999999, default_cfg_skipProtectionRandomTime } },
 		{ IDC_PROTECTION_PREVIOUS_TIME, { 0, default_cfg_skipProtectionPreviousTime, 999999999, default_cfg_skipProtectionPreviousTime } },
+		{ IDC_PROTECTION_DOUBLECLICK_TIME, { 0, default_cfg_skipProtectionDoubleClickTime, 999999999, default_cfg_skipProtectionDoubleClickTime } },
 	};
 
 #ifdef _WIN32
@@ -378,6 +412,7 @@ namespace foo_skipcount {
 			COMMAND_HANDLER_EX(IDC_COUNT_NEXT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_RANDOM, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_PREVIOUS, BN_CLICKED, OnButtonChange)
+			COMMAND_HANDLER_EX(IDC_COUNT_DOUBLECLICK, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_STOP, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_COUNT_FROM_PAUSE, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_CONDITION, CBN_SELCHANGE, OnSelectionChange)
@@ -397,10 +432,14 @@ namespace foo_skipcount {
 			COMMAND_HANDLER_EX(IDC_PROTECTION_PREVIOUS, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_PROTECTION_PREVIOUS_TIME, EN_CHANGE, OnEditChange)
 			COMMAND_HANDLER_EX(IDC_PROTECTION_PREVIOUS_TIME, EN_KILLFOCUS, OnFocusLost)
+			COMMAND_HANDLER_EX(IDC_PROTECTION_DOUBLECLICK, BN_CLICKED, OnButtonChange)
+			COMMAND_HANDLER_EX(IDC_PROTECTION_DOUBLECLICK_TIME, EN_CHANGE, OnEditChange)
+			COMMAND_HANDLER_EX(IDC_PROTECTION_DOUBLECLICK_TIME, EN_KILLFOCUS, OnFocusLost)
 			COMMAND_HANDLER_EX(IDC_PASTE_DISABLE_DIALOG, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_PASTE_NEXT_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_PASTE_RANDOM_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_PASTE_PREVIOUS_COUNT, BN_CLICKED, OnButtonChange)
+			COMMAND_HANDLER_EX(IDC_PASTE_DOUBLECLICK_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_PASTE_SKIP_SELECTION, CBN_SELCHANGE, OnSelectionChange)
 			COMMAND_HANDLER_EX(IDC_XML_DISABLE_DIALOG, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_XML_EXPORT_JS_TIMESTAMP, BN_CLICKED, OnButtonChange)
@@ -408,6 +447,7 @@ namespace foo_skipcount {
 			COMMAND_HANDLER_EX(IDC_XML_EXPORT_NEXT_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_XML_EXPORT_RANDOM_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_XML_EXPORT_PREVIOUS_COUNT, BN_CLICKED, OnButtonChange)
+			COMMAND_HANDLER_EX(IDC_XML_EXPORT_DOUBLECLICK_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_XML_EXPORT_TOTAL_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_XML_EXPORT_LATEST_SKIP, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_XML_EXPORT_OLDEST_SKIP, BN_CLICKED, OnButtonChange)
@@ -417,6 +457,7 @@ namespace foo_skipcount {
 			COMMAND_HANDLER_EX(IDC_TAG_NEXT_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_TAG_RANDOM_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_TAG_PREVIOUS_COUNT, BN_CLICKED, OnButtonChange)
+			COMMAND_HANDLER_EX(IDC_TAG_DOUBLECLICK_COUNT, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_TAG_CURRENT_TIMESTAMP, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_TAG_ALL_TIMESTAMPS_RAW, BN_CLICKED, OnButtonChange)
 			COMMAND_HANDLER_EX(IDC_TAG_TIMESTAMP_DELIMITER, CBN_SELCHANGE, OnSelectionChange)

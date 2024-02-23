@@ -11,22 +11,26 @@ namespace foo_skipcount {
 	cfg_bool cfg_countNext(guid_cfg_countNext, default_cfg_countNext),
 		cfg_countRandom(guid_cfg_countRandom, default_cfg_countRandom),
 		cfg_countPrevious(guid_cfg_countPrevious, default_cfg_countPrevious),
+		cfg_countDoubleClick(guid_cfg_countDoubleClick, default_cfg_countDoubleClick),
 		cfg_countFromStop(guid_cfg_countFromStop, default_cfg_countFromStop),
 		cfg_countFromPause(guid_cfg_countFromPause, default_cfg_countFromPause),
 		cfg_confirmContextClear(guid_cfg_confirmContextClear, default_cfg_confirmContextClear),
 		cfg_skipProtectionNext(guid_cfg_skipProtectionNext, default_cfg_skipProtectionNext),
 		cfg_skipProtectionRandom(guid_cfg_skipProtectionRandom, default_cfg_skipProtectionRandom),
 		cfg_skipProtectionPrevious(guid_cfg_skipProtectionPrevious, default_cfg_skipProtectionPrevious),
+		cfg_skipProtectionDoubleClick(guid_cfg_skipProtectionDoubleClick, default_cfg_skipProtectionDoubleClick),
 		cfg_pasteDisableDialog(guid_cfg_pasteDisableDialog, default_cfg_pasteDisableDialog),
 		cfg_pasteNextCount(guid_cfg_pasteNextCount, default_cfg_pasteNextCount),
 		cfg_pasteRandomCount(guid_cfg_pasteRandomCount, default_cfg_pasteRandomCount),
 		cfg_pastePreviousCount(guid_cfg_pastePreviousCount, default_cfg_pastePreviousCount),
+		cfg_pasteDoubleClickCount(guid_cfg_pasteDoubleClickCount, default_cfg_pasteDoubleClickCount),
 		cfg_xmlDisableDialog(guid_cfg_xmlDisableDialog, default_cfg_xmlDisableDialog),
 		cfg_xmlExportJSTimestamp(guid_cfg_xmlExportJSTimestamp, default_cfg_xmlExportJSTimestamp),
 		cfg_xmlExportDateTime(guid_cfg_xmlExportDateTime, default_cfg_xmlExportDateTime),
 		cfg_xmlExportNextCount(guid_cfg_xmlExportNextCount, default_cfg_xmlExportNextCount),
 		cfg_xmlExportRandomCount(guid_cfg_xmlExportRandomCount, default_cfg_xmlExportRandomCount),
 		cfg_xmlExportPreviousCount(guid_cfg_xmlExportPreviousCount, default_cfg_xmlExportPreviousCount),
+		cfg_xmlExportDoubleClickCount(guid_cfg_xmlExportDoubleClickCount, default_cfg_xmlExportDoubleClickCount),
 		cfg_xmlExportTotalCount(guid_cfg_xmlExportTotalCount, default_cfg_xmlExportTotalCount),
 		cfg_xmlExportLatestSkip(guid_cfg_xmlExportLatestSkip, default_cfg_xmlExportLatestSkip),
 		cfg_xmlExportOldestSkip(guid_cfg_xmlExportOldestSkip, default_cfg_xmlExportOldestSkip),
@@ -36,6 +40,7 @@ namespace foo_skipcount {
 		cfg_tagNextCount(guid_cfg_tagNextCount, default_cfg_tagNextCount),
 		cfg_tagRandomCount(guid_cfg_tagRandomCount, default_cfg_tagRandomCount),
 		cfg_tagPreviousCount(guid_cfg_tagPreviousCount, default_cfg_tagPreviousCount),
+		cfg_tagDoubleClickCount(guid_cfg_tagDoubleClickCount, default_cfg_tagDoubleClickCount),
 		cfg_tagCurrentTimestamp(guid_cfg_tagCurrentTimestamp, default_cfg_tagCurrentTimestamp),
 		cfg_tagAllTimestampsRaw(guid_cfg_tagAllTimestampsRaw, default_cfg_tagAllTimestampsRaw);
 
@@ -46,6 +51,7 @@ namespace foo_skipcount {
 		cfg_skipProtectionNextTime(guid_cfg_skipProtectionNextTime, default_cfg_skipProtectionNextTime),
 		cfg_skipProtectionRandomTime(guid_cfg_skipProtectionRandomTime, default_cfg_skipProtectionRandomTime),
 		cfg_skipProtectionPreviousTime(guid_cfg_skipProtectionPreviousTime, default_cfg_skipProtectionPreviousTime),
+		cfg_skipProtectionDoubleClickTime(guid_cfg_skipProtectionDoubleClickTime, default_cfg_skipProtectionDoubleClickTime),
 		cfg_pasteSkipSelection(guid_cfg_pasteSkipSelection, default_cfg_pasteSkipSelection),
 		cfg_tagTimestampDelimiter(guid_cfg_tagTimestampDelimiter, default_cfg_tagTimestampDelimiter);
 
@@ -67,6 +73,7 @@ namespace foo_skipcount {
 		uButton_SetCheck(hWnd, IDC_PASTE_NEXT_COUNT, cfg_pasteNextCount);
 		uButton_SetCheck(hWnd, IDC_PASTE_RANDOM_COUNT, cfg_pasteRandomCount);
 		uButton_SetCheck(hWnd, IDC_PASTE_PREVIOUS_COUNT, cfg_pastePreviousCount);
+		uButton_SetCheck(hWnd, IDC_PASTE_DOUBLECLICK_COUNT, cfg_pasteDoubleClickCount);
 		CComboBox pasteSkipTypesDropList = (CComboBox)GetDlgItem(hWnd, IDC_PASTE_SKIP_SELECTION);
 		for(int i = 0; i < PASTESKIP_TOTAL; ++i) {
 			pasteSkipTypesDropList.InsertString(i, pasteSkipSelectionStrings[i]);
@@ -81,6 +88,7 @@ namespace foo_skipcount {
 		uButton_SetCheck(hWnd, IDC_XML_EXPORT_NEXT_COUNT, cfg_xmlExportNextCount);
 		uButton_SetCheck(hWnd, IDC_XML_EXPORT_RANDOM_COUNT, cfg_xmlExportRandomCount);
 		uButton_SetCheck(hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT, cfg_xmlExportPreviousCount);
+		uButton_SetCheck(hWnd, IDC_XML_EXPORT_DOUBLECLICK_COUNT, cfg_xmlExportDoubleClickCount);
 		uButton_SetCheck(hWnd, IDC_XML_EXPORT_TOTAL_COUNT, cfg_xmlExportTotalCount);
 		uButton_SetCheck(hWnd, IDC_XML_EXPORT_LATEST_SKIP, cfg_xmlExportLatestSkip);
 		uButton_SetCheck(hWnd, IDC_XML_EXPORT_OLDEST_SKIP, cfg_xmlExportOldestSkip);
@@ -93,6 +101,7 @@ namespace foo_skipcount {
 		uButton_SetCheck(hWnd, IDC_TAG_NEXT_COUNT, cfg_tagNextCount);
 		uButton_SetCheck(hWnd, IDC_TAG_RANDOM_COUNT, cfg_tagRandomCount);
 		uButton_SetCheck(hWnd, IDC_TAG_PREVIOUS_COUNT, cfg_tagPreviousCount);
+		uButton_SetCheck(hWnd, IDC_TAG_DOUBLECLICK_COUNT, cfg_tagDoubleClickCount);
 		uButton_SetCheck(hWnd, IDC_TAG_CURRENT_TIMESTAMP, cfg_tagCurrentTimestamp);
 		uButton_SetCheck(hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW, cfg_tagAllTimestampsRaw);
 		CComboBox tagDelimiterDropList = (CComboBox)GetDlgItem(hWnd, IDC_TAG_TIMESTAMP_DELIMITER);
@@ -130,6 +139,7 @@ namespace foo_skipcount {
 		cfg_countNext = uButton_GetCheck(m_hWnd, IDC_COUNT_NEXT);
 		cfg_countRandom = uButton_GetCheck(m_hWnd, IDC_COUNT_RANDOM);
 		cfg_countPrevious = uButton_GetCheck(m_hWnd, IDC_COUNT_PREVIOUS);
+		cfg_countDoubleClick = uButton_GetCheck(m_hWnd, IDC_COUNT_DOUBLECLICK);
 		cfg_countFromStop = uButton_GetCheck(m_hWnd, IDC_COUNT_FROM_STOP);
 		cfg_countFromPause = uButton_GetCheck(m_hWnd, IDC_COUNT_FROM_PAUSE);
 		cfg_condition = (t_int32)uSendDlgItemMessage(IDC_CONDITION, CB_GETCURSEL);
@@ -143,10 +153,13 @@ namespace foo_skipcount {
 		cfg_skipProtectionRandomTime = GetIntConformedToBounds(m_hWnd, IDC_PROTECTION_RANDOM_TIME);
 		cfg_skipProtectionPrevious = uButton_GetCheck(m_hWnd, IDC_PROTECTION_PREVIOUS);
 		cfg_skipProtectionPreviousTime = GetIntConformedToBounds(m_hWnd, IDC_PROTECTION_PREVIOUS_TIME);
+		cfg_skipProtectionDoubleClick = uButton_GetCheck(m_hWnd, IDC_PROTECTION_DOUBLECLICK);
+		cfg_skipProtectionDoubleClickTime = GetIntConformedToBounds(m_hWnd, IDC_PROTECTION_DOUBLECLICK_TIME);
 		cfg_pasteDisableDialog = uButton_GetCheck(m_hWnd, IDC_PASTE_DISABLE_DIALOG);
 		cfg_pasteNextCount = uButton_GetCheck(m_hWnd, IDC_PASTE_NEXT_COUNT);
 		cfg_pasteRandomCount = uButton_GetCheck(m_hWnd, IDC_PASTE_RANDOM_COUNT);
 		cfg_pastePreviousCount = uButton_GetCheck(m_hWnd, IDC_PASTE_PREVIOUS_COUNT);
+		cfg_pasteDoubleClickCount = uButton_GetCheck(m_hWnd, IDC_PASTE_DOUBLECLICK_COUNT);
 		cfg_pasteSkipSelection = (t_int32)uSendDlgItemMessage(IDC_PASTE_SKIP_SELECTION, CB_GETCURSEL);
 		cfg_xmlDisableDialog = uButton_GetCheck(m_hWnd, IDC_XML_DISABLE_DIALOG);
 		cfg_xmlExportJSTimestamp = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_JS_TIMESTAMP);
@@ -154,6 +167,7 @@ namespace foo_skipcount {
 		cfg_xmlExportNextCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_NEXT_COUNT);
 		cfg_xmlExportRandomCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_RANDOM_COUNT);
 		cfg_xmlExportPreviousCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT);
+		cfg_xmlExportDoubleClickCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_DOUBLECLICK_COUNT);
 		cfg_xmlExportTotalCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_TOTAL_COUNT);
 		cfg_xmlExportLatestSkip = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_LATEST_SKIP);
 		cfg_xmlExportOldestSkip = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP);
@@ -163,6 +177,7 @@ namespace foo_skipcount {
 		cfg_tagNextCount = uButton_GetCheck(m_hWnd, IDC_TAG_NEXT_COUNT);
 		cfg_tagRandomCount = uButton_GetCheck(m_hWnd, IDC_TAG_RANDOM_COUNT);
 		cfg_tagPreviousCount = uButton_GetCheck(m_hWnd, IDC_TAG_PREVIOUS_COUNT);
+		cfg_tagDoubleClickCount = uButton_GetCheck(m_hWnd, IDC_TAG_DOUBLECLICK_COUNT);
 		cfg_tagCurrentTimestamp = uButton_GetCheck(m_hWnd, IDC_TAG_CURRENT_TIMESTAMP);
 		cfg_tagAllTimestampsRaw = uButton_GetCheck(m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW);
 		cfg_tagTimestampDelimiter = (t_int32)uSendDlgItemMessage(IDC_TAG_TIMESTAMP_DELIMITER, CB_GETCURSEL);
@@ -175,6 +190,7 @@ namespace foo_skipcount {
 		uButton_SetCheck(m_hWnd, IDC_COUNT_NEXT, default_cfg_countNext);
 		uButton_SetCheck(m_hWnd, IDC_COUNT_RANDOM, default_cfg_countRandom);
 		uButton_SetCheck(m_hWnd, IDC_COUNT_PREVIOUS, default_cfg_countPrevious);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_DOUBLECLICK, default_cfg_countDoubleClick);
 		uButton_SetCheck(m_hWnd, IDC_COUNT_FROM_STOP, default_cfg_countFromStop);
 		uButton_SetCheck(m_hWnd, IDC_COUNT_FROM_PAUSE, default_cfg_countFromPause);
 		uSendDlgItemMessage(IDC_CONDITION, CB_SETCURSEL, default_cfg_condition, NULL);
@@ -188,10 +204,13 @@ namespace foo_skipcount {
 		uSetDlgItemInt(IDC_PROTECTION_RANDOM_TIME, default_cfg_skipProtectionRandomTime, TRUE);
 		uButton_SetCheck(m_hWnd, IDC_PROTECTION_PREVIOUS, default_cfg_skipProtectionPrevious);
 		uSetDlgItemInt(IDC_PROTECTION_PREVIOUS_TIME, default_cfg_skipProtectionPreviousTime, TRUE);
+		uButton_SetCheck(m_hWnd, IDC_PROTECTION_DOUBLECLICK, default_cfg_skipProtectionDoubleClick);
+		uSetDlgItemInt(IDC_PROTECTION_DOUBLECLICK_TIME, default_cfg_skipProtectionDoubleClickTime, TRUE);
 		uButton_SetCheck(m_hWnd, IDC_PASTE_DISABLE_DIALOG, default_cfg_pasteDisableDialog);
 		uButton_SetCheck(m_hWnd, IDC_PASTE_NEXT_COUNT, default_cfg_pasteNextCount);
 		uButton_SetCheck(m_hWnd, IDC_PASTE_RANDOM_COUNT, default_cfg_pasteRandomCount);
 		uButton_SetCheck(m_hWnd, IDC_PASTE_PREVIOUS_COUNT, default_cfg_pastePreviousCount);
+		uButton_SetCheck(m_hWnd, IDC_PASTE_DOUBLECLICK_COUNT, default_cfg_pasteDoubleClickCount);
 		uSendDlgItemMessage(IDC_PASTE_SKIP_SELECTION, CB_SETCURSEL, default_cfg_pasteSkipSelection, NULL);
 		uButton_SetCheck(m_hWnd, IDC_XML_DISABLE_DIALOG, default_cfg_xmlDisableDialog);
 		uButton_SetCheck(m_hWnd, IDC_XML_EXPORT_JS_TIMESTAMP, default_cfg_xmlExportJSTimestamp);
@@ -199,6 +218,7 @@ namespace foo_skipcount {
 		uButton_SetCheck(m_hWnd, IDC_XML_EXPORT_NEXT_COUNT, default_cfg_xmlExportNextCount);
 		uButton_SetCheck(m_hWnd, IDC_XML_EXPORT_RANDOM_COUNT, default_cfg_xmlExportRandomCount);
 		uButton_SetCheck(m_hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT, default_cfg_xmlExportPreviousCount);
+		uButton_SetCheck(m_hWnd, IDC_XML_EXPORT_DOUBLECLICK_COUNT, default_cfg_xmlExportDoubleClickCount);
 		uButton_SetCheck(m_hWnd, IDC_XML_EXPORT_TOTAL_COUNT, default_cfg_xmlExportTotalCount);
 		uButton_SetCheck(m_hWnd, IDC_XML_EXPORT_LATEST_SKIP, default_cfg_xmlExportLatestSkip);
 		uButton_SetCheck(m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP, default_cfg_xmlExportOldestSkip);
@@ -208,6 +228,7 @@ namespace foo_skipcount {
 		uButton_SetCheck(m_hWnd, IDC_TAG_NEXT_COUNT, default_cfg_tagNextCount);
 		uButton_SetCheck(m_hWnd, IDC_TAG_RANDOM_COUNT, default_cfg_tagRandomCount);
 		uButton_SetCheck(m_hWnd, IDC_TAG_PREVIOUS_COUNT, default_cfg_tagPreviousCount);
+		uButton_SetCheck(m_hWnd, IDC_TAG_DOUBLECLICK_COUNT, default_cfg_tagDoubleClickCount);
 		uButton_SetCheck(m_hWnd, IDC_TAG_CURRENT_TIMESTAMP, default_cfg_tagCurrentTimestamp);
 		uButton_SetCheck(m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW, default_cfg_tagAllTimestampsRaw);
 		uSendDlgItemMessage(IDC_TAG_TIMESTAMP_DELIMITER, CB_SETCURSEL, default_cfg_tagTimestampDelimiter, NULL);
@@ -222,6 +243,7 @@ namespace foo_skipcount {
 		uButton_SetCheck(m_hWnd, IDC_COUNT_NEXT, cfg_countNext);
 		uButton_SetCheck(m_hWnd, IDC_COUNT_RANDOM, cfg_countRandom);
 		uButton_SetCheck(m_hWnd, IDC_COUNT_PREVIOUS, cfg_countPrevious);
+		uButton_SetCheck(m_hWnd, IDC_COUNT_DOUBLECLICK, cfg_countDoubleClick);
 		uButton_SetCheck(m_hWnd, IDC_COUNT_FROM_STOP, cfg_countFromStop);
 		uButton_SetCheck(m_hWnd, IDC_COUNT_FROM_PAUSE, cfg_countFromPause);
 		CComboBox conditionDropList = (CComboBox)uGetDlgItem(IDC_CONDITION);
@@ -252,6 +274,10 @@ namespace foo_skipcount {
 		uButton_SetCheck(m_hWnd, IDC_PROTECTION_PREVIOUS, cfg_skipProtectionPrevious);
 		uSetDlgItemInt(IDC_PROTECTION_PREVIOUS_TIME, cfg_skipProtectionPreviousTime, FALSE);
 		uSendDlgItemMessage(IDC_PROTECTION_PREVIOUS_TIME, EM_SETLIMITTEXT, 3, NULL);
+		uButton_SetCheck(m_hWnd, IDC_PROTECTION_DOUBLECLICK, cfg_skipProtectionDoubleClick);
+		uSetDlgItemInt(IDC_PROTECTION_DOUBLECLICK_TIME, cfg_skipProtectionDoubleClickTime, FALSE);
+		uSendDlgItemMessage(IDC_PROTECTION_DOUBLECLICK_TIME, EM_SETLIMITTEXT, 3, NULL);
+
 		InitPasteControls(m_hWnd);
 		InitXmlControls(m_hWnd);
 		InitTagControls(m_hWnd);
@@ -259,39 +285,44 @@ namespace foo_skipcount {
 		CreateTooltip(tooltips[0], m_hWnd, IDC_COUNT_NEXT);
 		CreateTooltip(tooltips[1], m_hWnd, IDC_COUNT_RANDOM);
 		CreateTooltip(tooltips[2], m_hWnd, IDC_COUNT_PREVIOUS);
-		CreateTooltip(tooltips[3], m_hWnd, IDC_COUNT_FROM_STOP);
-		CreateTooltip(tooltips[4], m_hWnd, IDC_COUNT_FROM_PAUSE);
-		CreateTooltip(tooltips[5], m_hWnd, IDC_CONDITION);
-		CreateTooltip(tooltips[6], m_hWnd, IDC_TIME);
-		CreateTooltip(tooltips[7], m_hWnd, IDC_PERCENT);
-		CreateTooltip(tooltips[8], m_hWnd, IDC_LOG_SKIP_TIMES);
-		CreateTooltip(tooltips[9], m_hWnd, IDC_CONFIRM_CONTEXT_CLEAR);
-		CreateTooltip(tooltips[10], m_hWnd, IDC_PROTECTION_NEXT);
-		CreateTooltip(tooltips[11], m_hWnd, IDC_PROTECTION_RANDOM);
-		CreateTooltip(tooltips[12], m_hWnd, IDC_PROTECTION_PREVIOUS);
-		CreateTooltip(tooltips[13], m_hWnd, IDC_PASTE_DISABLE_DIALOG);
-		CreateTooltip(tooltips[14], m_hWnd, IDC_PASTE_NEXT_COUNT);
-		CreateTooltip(tooltips[15], m_hWnd, IDC_PASTE_RANDOM_COUNT);
-		CreateTooltip(tooltips[16], m_hWnd, IDC_PASTE_PREVIOUS_COUNT);
-		CreateTooltip(tooltips[17], m_hWnd, IDC_PASTE_SKIP_SELECTION);
-		CreateTooltip(tooltips[18], m_hWnd, IDC_XML_DISABLE_DIALOG);
-		CreateTooltip(tooltips[19], m_hWnd, IDC_XML_EXPORT_JS_TIMESTAMP);
-		CreateTooltip(tooltips[20], m_hWnd, IDC_XML_EXPORT_DATE_TIME);
-		CreateTooltip(tooltips[21], m_hWnd, IDC_XML_EXPORT_NEXT_COUNT);
-		CreateTooltip(tooltips[22], m_hWnd, IDC_XML_EXPORT_RANDOM_COUNT);
-		CreateTooltip(tooltips[23], m_hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT);
-		CreateTooltip(tooltips[24], m_hWnd, IDC_XML_EXPORT_TOTAL_COUNT);
-		CreateTooltip(tooltips[25], m_hWnd, IDC_XML_EXPORT_LATEST_SKIP);
-		CreateTooltip(tooltips[26], m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP);
-		CreateTooltip(tooltips[27], m_hWnd, IDC_XML_EXPORT_TIMESTAMP_COUNT);
-		CreateTooltip(tooltips[28], m_hWnd, IDC_XML_EXPORT_ALL_SKIPS);
-		CreateTooltip(tooltips[29], m_hWnd, IDC_TAG_DISABLE_DIALOG);
-		CreateTooltip(tooltips[30], m_hWnd, IDC_TAG_NEXT_COUNT);
-		CreateTooltip(tooltips[31], m_hWnd, IDC_TAG_RANDOM_COUNT);
-		CreateTooltip(tooltips[32], m_hWnd, IDC_TAG_PREVIOUS_COUNT);
-		CreateTooltip(tooltips[33], m_hWnd, IDC_TAG_CURRENT_TIMESTAMP);
-		CreateTooltip(tooltips[34], m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW);
-		CreateTooltip(tooltips[35], m_hWnd, IDC_TAG_TIMESTAMP_DELIMITER);
+		CreateTooltip(tooltips[3], m_hWnd, IDC_COUNT_DOUBLECLICK);
+		CreateTooltip(tooltips[4], m_hWnd, IDC_COUNT_FROM_STOP);
+		CreateTooltip(tooltips[5], m_hWnd, IDC_COUNT_FROM_PAUSE);
+		CreateTooltip(tooltips[6], m_hWnd, IDC_CONDITION);
+		CreateTooltip(tooltips[7], m_hWnd, IDC_TIME);
+		CreateTooltip(tooltips[8], m_hWnd, IDC_PERCENT);
+		CreateTooltip(tooltips[9], m_hWnd, IDC_LOG_SKIP_TIMES);
+		CreateTooltip(tooltips[10], m_hWnd, IDC_CONFIRM_CONTEXT_CLEAR);
+		CreateTooltip(tooltips[11], m_hWnd, IDC_PROTECTION_NEXT);
+		CreateTooltip(tooltips[12], m_hWnd, IDC_PROTECTION_RANDOM);
+		CreateTooltip(tooltips[13], m_hWnd, IDC_PROTECTION_PREVIOUS);
+		CreateTooltip(tooltips[14], m_hWnd, IDC_PROTECTION_DOUBLECLICK);
+		CreateTooltip(tooltips[15], m_hWnd, IDC_PASTE_DISABLE_DIALOG);
+		CreateTooltip(tooltips[16], m_hWnd, IDC_PASTE_NEXT_COUNT);
+		CreateTooltip(tooltips[17], m_hWnd, IDC_PASTE_RANDOM_COUNT);
+		CreateTooltip(tooltips[18], m_hWnd, IDC_PASTE_PREVIOUS_COUNT);
+		CreateTooltip(tooltips[19], m_hWnd, IDC_PASTE_DOUBLECLICK_COUNT);
+		CreateTooltip(tooltips[20], m_hWnd, IDC_PASTE_SKIP_SELECTION);
+		CreateTooltip(tooltips[21], m_hWnd, IDC_XML_DISABLE_DIALOG);
+		CreateTooltip(tooltips[22], m_hWnd, IDC_XML_EXPORT_JS_TIMESTAMP);
+		CreateTooltip(tooltips[23], m_hWnd, IDC_XML_EXPORT_DATE_TIME);
+		CreateTooltip(tooltips[24], m_hWnd, IDC_XML_EXPORT_NEXT_COUNT);
+		CreateTooltip(tooltips[25], m_hWnd, IDC_XML_EXPORT_RANDOM_COUNT);
+		CreateTooltip(tooltips[26], m_hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT);
+		CreateTooltip(tooltips[27], m_hWnd, IDC_XML_EXPORT_DOUBLECLICK_COUNT);
+		CreateTooltip(tooltips[28], m_hWnd, IDC_XML_EXPORT_TOTAL_COUNT);
+		CreateTooltip(tooltips[29], m_hWnd, IDC_XML_EXPORT_LATEST_SKIP);
+		CreateTooltip(tooltips[30], m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP);
+		CreateTooltip(tooltips[31], m_hWnd, IDC_XML_EXPORT_TIMESTAMP_COUNT);
+		CreateTooltip(tooltips[32], m_hWnd, IDC_XML_EXPORT_ALL_SKIPS);
+		CreateTooltip(tooltips[33], m_hWnd, IDC_TAG_DISABLE_DIALOG);
+		CreateTooltip(tooltips[34], m_hWnd, IDC_TAG_NEXT_COUNT);
+		CreateTooltip(tooltips[34], m_hWnd, IDC_TAG_RANDOM_COUNT);
+		CreateTooltip(tooltips[35], m_hWnd, IDC_TAG_PREVIOUS_COUNT);
+		CreateTooltip(tooltips[36], m_hWnd, IDC_TAG_DOUBLECLICK_COUNT);
+		CreateTooltip(tooltips[37], m_hWnd, IDC_TAG_CURRENT_TIMESTAMP);
+		CreateTooltip(tooltips[38], m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW);
+		CreateTooltip(tooltips[39], m_hWnd, IDC_TAG_TIMESTAMP_DELIMITER);
 
 		return FALSE;
 	}
@@ -335,6 +366,9 @@ namespace foo_skipcount {
 			else if(ctrlID == IDC_PROTECTION_PREVIOUS_TIME) {
 				newVal = cfg_skipProtectionPreviousTime;
 			}
+			else if(ctrlID == IDC_PROTECTION_DOUBLECLICK_TIME) {
+				newVal = cfg_skipProtectionDoubleClickTime;
+			}
 			uSetDlgItemInt(ctrlID, newVal, FALSE);
 		}
 		else {
@@ -370,6 +404,7 @@ namespace foo_skipcount {
 		return uButton_GetCheck(m_hWnd, IDC_COUNT_NEXT) != cfg_countNext ||
 			uButton_GetCheck(m_hWnd, IDC_COUNT_RANDOM) != cfg_countRandom ||
 			uButton_GetCheck(m_hWnd, IDC_COUNT_PREVIOUS) != cfg_countPrevious ||
+			uButton_GetCheck(m_hWnd, IDC_COUNT_DOUBLECLICK) != cfg_countDoubleClick ||
 			uButton_GetCheck(m_hWnd, IDC_COUNT_FROM_STOP) != cfg_countFromStop ||
 			uButton_GetCheck(m_hWnd, IDC_COUNT_FROM_PAUSE) != cfg_countFromPause ||
 			(t_int32)uSendDlgItemMessage(IDC_CONDITION, CB_GETCURSEL) != cfg_condition ||
@@ -383,10 +418,13 @@ namespace foo_skipcount {
 			uGetDlgItemInt(IDC_PROTECTION_RANDOM_TIME, NULL, FALSE) != cfg_skipProtectionRandomTime ||
 			uButton_GetCheck(m_hWnd, IDC_PROTECTION_PREVIOUS) != cfg_skipProtectionPrevious ||
 			uGetDlgItemInt(IDC_PROTECTION_PREVIOUS_TIME, NULL, FALSE) != cfg_skipProtectionPreviousTime ||
+			uButton_GetCheck(m_hWnd, IDC_PROTECTION_DOUBLECLICK) != cfg_skipProtectionDoubleClick ||
+			uGetDlgItemInt(IDC_PROTECTION_DOUBLECLICK_TIME, NULL, FALSE) != cfg_skipProtectionDoubleClickTime ||
 			uButton_GetCheck(m_hWnd, IDC_PASTE_DISABLE_DIALOG) != cfg_pasteDisableDialog ||
 			uButton_GetCheck(m_hWnd, IDC_PASTE_NEXT_COUNT) != cfg_pasteNextCount ||
 			uButton_GetCheck(m_hWnd, IDC_PASTE_RANDOM_COUNT) != cfg_pasteRandomCount ||
 			uButton_GetCheck(m_hWnd, IDC_PASTE_PREVIOUS_COUNT) != cfg_pastePreviousCount ||
+			uButton_GetCheck(m_hWnd, IDC_PASTE_DOUBLECLICK_COUNT) != cfg_pasteDoubleClickCount ||
 			(t_int32)uSendDlgItemMessage(IDC_PASTE_SKIP_SELECTION, CB_GETCURSEL, NULL, NULL) != cfg_pasteSkipSelection ||
 			uButton_GetCheck(m_hWnd, IDC_XML_DISABLE_DIALOG) != cfg_xmlDisableDialog ||
 			uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_JS_TIMESTAMP) != cfg_xmlExportJSTimestamp ||
@@ -394,6 +432,7 @@ namespace foo_skipcount {
 			uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_NEXT_COUNT) != cfg_xmlExportNextCount ||
 			uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_RANDOM_COUNT) != cfg_xmlExportRandomCount ||
 			uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT) != cfg_xmlExportPreviousCount ||
+			uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_DOUBLECLICK_COUNT) != cfg_xmlExportDoubleClickCount ||
 			uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_TOTAL_COUNT) != cfg_xmlExportTotalCount ||
 			uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_LATEST_SKIP) != cfg_xmlExportLatestSkip ||
 			uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP) != cfg_xmlExportOldestSkip ||
@@ -403,6 +442,7 @@ namespace foo_skipcount {
 			uButton_GetCheck(m_hWnd, IDC_TAG_NEXT_COUNT) != cfg_tagNextCount ||
 			uButton_GetCheck(m_hWnd, IDC_TAG_RANDOM_COUNT) != cfg_tagRandomCount ||
 			uButton_GetCheck(m_hWnd, IDC_TAG_PREVIOUS_COUNT) != cfg_tagPreviousCount ||
+			uButton_GetCheck(m_hWnd, IDC_TAG_DOUBLECLICK_COUNT) != cfg_tagDoubleClickCount ||
 			uButton_GetCheck(m_hWnd, IDC_TAG_CURRENT_TIMESTAMP) != cfg_tagCurrentTimestamp ||
 			uButton_GetCheck(m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW) != cfg_tagAllTimestampsRaw ||
 			(t_int32)uSendDlgItemMessage(IDC_TAG_TIMESTAMP_DELIMITER, CB_GETCURSEL, NULL, NULL) != cfg_tagTimestampDelimiter;
@@ -429,7 +469,8 @@ namespace foo_skipcount {
 		CreateTooltip(tooltips[1], m_hWnd, IDC_PASTE_NEXT_COUNT);
 		CreateTooltip(tooltips[2], m_hWnd, IDC_PASTE_RANDOM_COUNT);
 		CreateTooltip(tooltips[3], m_hWnd, IDC_PASTE_PREVIOUS_COUNT);
-		CreateTooltip(tooltips[4], m_hWnd, IDC_PASTE_SKIP_SELECTION);
+		CreateTooltip(tooltips[4], m_hWnd, IDC_PASTE_DOUBLECLICK_COUNT);
+		CreateTooltip(tooltips[5], m_hWnd, IDC_PASTE_SKIP_SELECTION);
 
 		return TRUE;
 	}
@@ -439,6 +480,7 @@ namespace foo_skipcount {
 		cfg_pasteNextCount = uButton_GetCheck(m_hWnd, IDC_PASTE_NEXT_COUNT);
 		cfg_pasteRandomCount = uButton_GetCheck(m_hWnd, IDC_PASTE_RANDOM_COUNT);
 		cfg_pastePreviousCount = uButton_GetCheck(m_hWnd, IDC_PASTE_PREVIOUS_COUNT);
+		cfg_pasteDoubleClickCount = uButton_GetCheck(m_hWnd, IDC_PASTE_DOUBLECLICK_COUNT);
 		cfg_pasteSkipSelection = (t_int32)uSendDlgItemMessage(IDC_PASTE_SKIP_SELECTION, CB_GETCURSEL);
 	}
 
@@ -452,6 +494,7 @@ namespace foo_skipcount {
 			r |= uButton_GetCheck(m_hWnd, IDC_PASTE_NEXT_COUNT) ? PASTE_NEXTCOUNT : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_PASTE_RANDOM_COUNT) ? PASTE_RANDOMCOUNT : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_PASTE_PREVIOUS_COUNT) ? PASTE_PREVIOUSCOUNT : 0;
+			r |= uButton_GetCheck(m_hWnd, IDC_PASTE_DOUBLECLICK_COUNT) ? PASTE_DOUBLECLICKCOUNT : 0;
 
 			switch((t_int32)uSendDlgItemMessage(IDC_PASTE_SKIP_SELECTION, CB_GETCURSEL)) {
 				case PASTESKIP_ALL:
@@ -504,11 +547,12 @@ namespace foo_skipcount {
 		CreateTooltip(tooltips[3], m_hWnd, IDC_XML_EXPORT_NEXT_COUNT);
 		CreateTooltip(tooltips[4], m_hWnd, IDC_XML_EXPORT_RANDOM_COUNT);
 		CreateTooltip(tooltips[5], m_hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT);
-		CreateTooltip(tooltips[6], m_hWnd, IDC_XML_EXPORT_TOTAL_COUNT);
-		CreateTooltip(tooltips[7], m_hWnd, IDC_XML_EXPORT_LATEST_SKIP);
-		CreateTooltip(tooltips[8], m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP);
-		CreateTooltip(tooltips[9], m_hWnd, IDC_XML_EXPORT_TIMESTAMP_COUNT);
-		CreateTooltip(tooltips[10], m_hWnd, IDC_XML_EXPORT_ALL_SKIPS);
+		CreateTooltip(tooltips[6], m_hWnd, IDC_XML_EXPORT_DOUBLECLICK_COUNT);
+		CreateTooltip(tooltips[7], m_hWnd, IDC_XML_EXPORT_TOTAL_COUNT);
+		CreateTooltip(tooltips[8], m_hWnd, IDC_XML_EXPORT_LATEST_SKIP);
+		CreateTooltip(tooltips[9], m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP);
+		CreateTooltip(tooltips[10], m_hWnd, IDC_XML_EXPORT_TIMESTAMP_COUNT);
+		CreateTooltip(tooltips[11], m_hWnd, IDC_XML_EXPORT_ALL_SKIPS);
 
 		return TRUE;
 	}
@@ -520,6 +564,7 @@ namespace foo_skipcount {
 		cfg_xmlExportNextCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_NEXT_COUNT);
 		cfg_xmlExportRandomCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_RANDOM_COUNT);
 		cfg_xmlExportPreviousCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT);
+		cfg_xmlExportDoubleClickCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_DOUBLECLICK_COUNT);
 		cfg_xmlExportTotalCount = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_TOTAL_COUNT);
 		cfg_xmlExportLatestSkip = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_LATEST_SKIP);
 		cfg_xmlExportOldestSkip = uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP);
@@ -540,6 +585,7 @@ namespace foo_skipcount {
 			r |= uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_NEXT_COUNT) ? EXPORT_NEXTCOUNT : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_RANDOM_COUNT) ? EXPORT_RANDOMCOUNT : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_PREVIOUS_COUNT) ? EXPORT_PREVIOUSCOUNT : 0;
+			r |= uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_DOUBLECLICK_COUNT) ? EXPORT_DOUBLECLICKCOUNT : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_LATEST_SKIP) ? EXPORT_LATESTSKIP : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_OLDEST_SKIP) ? EXPORT_OLDESTSKIP : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_XML_EXPORT_TIMESTAMP_COUNT) ? EXPORT_TIMESTAMPCOUNT : 0;
@@ -568,9 +614,10 @@ namespace foo_skipcount {
 		CreateTooltip(tooltips[1], m_hWnd, IDC_TAG_NEXT_COUNT);
 		CreateTooltip(tooltips[2], m_hWnd, IDC_TAG_RANDOM_COUNT);
 		CreateTooltip(tooltips[3], m_hWnd, IDC_TAG_PREVIOUS_COUNT);
-		CreateTooltip(tooltips[4], m_hWnd, IDC_TAG_CURRENT_TIMESTAMP);
-		CreateTooltip(tooltips[5], m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW);
-		CreateTooltip(tooltips[6], m_hWnd, IDC_TAG_TIMESTAMP_DELIMITER);
+		CreateTooltip(tooltips[4], m_hWnd, IDC_TAG_DOUBLECLICK_COUNT);
+		CreateTooltip(tooltips[5], m_hWnd, IDC_TAG_CURRENT_TIMESTAMP);
+		CreateTooltip(tooltips[6], m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW);
+		CreateTooltip(tooltips[7], m_hWnd, IDC_TAG_TIMESTAMP_DELIMITER);
 
 		return TRUE;
 	}
@@ -580,6 +627,7 @@ namespace foo_skipcount {
 		cfg_tagNextCount = uButton_GetCheck(m_hWnd, IDC_TAG_NEXT_COUNT);
 		cfg_tagRandomCount = uButton_GetCheck(m_hWnd, IDC_TAG_RANDOM_COUNT);
 		cfg_tagPreviousCount = uButton_GetCheck(m_hWnd, IDC_TAG_PREVIOUS_COUNT);
+		cfg_tagDoubleClickCount = uButton_GetCheck(m_hWnd, IDC_TAG_DOUBLECLICK_COUNT);
 		cfg_tagCurrentTimestamp = uButton_GetCheck(m_hWnd, IDC_TAG_CURRENT_TIMESTAMP);
 		cfg_tagAllTimestampsRaw = uButton_GetCheck(m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW);
 		cfg_tagTimestampDelimiter = (t_int32)uSendDlgItemMessage(IDC_TAG_TIMESTAMP_DELIMITER, CB_GETCURSEL);
@@ -596,6 +644,7 @@ namespace foo_skipcount {
 			r |= uButton_GetCheck(m_hWnd, IDC_TAG_NEXT_COUNT) ? TAG_NEXTCOUNT : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_TAG_RANDOM_COUNT) ? TAG_RANDOMCOUNT : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_TAG_PREVIOUS_COUNT) ? TAG_PREVIOUSCOUNT : 0;
+			r |= uButton_GetCheck(m_hWnd, IDC_TAG_DOUBLECLICK_COUNT) ? TAG_DOUBLECLICKCOUNT : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_TAG_CURRENT_TIMESTAMP) ? TAG_CURRENTTIME : 0;
 			r |= uButton_GetCheck(m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW) ? TAG_ALLSKIPS : 0;
 			switch((t_int32)uSendDlgItemMessage(IDC_TAG_TIMESTAMP_DELIMITER, CB_GETCURSEL)) {
