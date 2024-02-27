@@ -19,10 +19,10 @@
     <ClCompile Include="fields.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tinyxml2.cpp">
+    <ClCompile Include="record.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="record.cpp">
+    <ClCompile Include="include\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,10 +48,10 @@
     <ClInclude Include="contextmenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tinyxml2.h">
+    <ClInclude Include="record.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="record.h">
+    <ClInclude Include="include\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

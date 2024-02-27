@@ -115,7 +115,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>$(SolutionDir)..\foobar2000-SDK\foobar2000\shared\shared.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)..\foobar2000-SDK\foobar2000\shared\shared-$(Platform).lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../foobar2000/shared;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
@@ -140,7 +140,7 @@ copy /Y "$(TargetPath)" "$(TargetDir)..\..\foobar2000 V1.6\profile\user-componen
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatSpecificWarningsAsErrors>4715</TreatSpecificWarningsAsErrors>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <AdditionalIncludeDirectories>..\foobar2000-SDK;..\foobar2000-SDK\foobar2000;..\foobar2000-SDK\wtl;..\src\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\foobar2000-SDK;..\foobar2000-SDK\foobar2000;..\src\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ConformanceMode>Default</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <SupportJustMyCode>true</SupportJustMyCode>
@@ -249,22 +249,22 @@ copy /Y "$(TargetPath)" "$(TargetDir)..\..\..\foobar2000 (x64)\profile\user-comp
     <ClCompile Include="contextmenu.cpp" />
     <ClCompile Include="fields.cpp" />
     <ClCompile Include="callbacks.cpp" />
+    <ClCompile Include="include\tinyxml2.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="record.cpp" />
     <ClCompile Include="SkipCount.cpp" />
     <ClCompile Include="preferences.cpp" />
-    <ClCompile Include="tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="contextmenu.h" />
     <ClInclude Include="fields.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="include\tinyxml2.h" />
     <ClInclude Include="preferences.h" />
     <ClInclude Include="record.h" />
     <ClInclude Include="SkipCount.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\foobar2000-SDK\foobar2000\helpers\foobar2000_sdk_helpers.vcxproj">

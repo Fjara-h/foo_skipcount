@@ -473,7 +473,7 @@ namespace foo_skipcount {
 		bool HasChanged();
 		void OnChanged();
 
-		CToolTipCtrl tooltips[36];
+		CToolTipCtrl tooltips[40];
 		const preferences_page_callback::ptr m_callback;
 		// Dark mode hooks object, must be a member of dialog class.
 		fb2k::CDarkModeHooks m_dark;
@@ -500,7 +500,7 @@ namespace foo_skipcount {
 			MSG_WM_CLOSE(OnClose)
 		END_MSG_MAP()
 	private:
-		CToolTipCtrl tooltips[5];
+		CToolTipCtrl tooltips[6];
 		// Dark mode hooks object, must be a member of dialog class.
 		fb2k::CDarkModeHooks m_dark;
 	};
@@ -527,7 +527,7 @@ namespace foo_skipcount {
 		END_MSG_MAP()
 
 	private:
-		CToolTipCtrl tooltips[11];
+		CToolTipCtrl tooltips[12];
 		// Dark mode hooks object, must be a member of dialog class.
 		fb2k::CDarkModeHooks m_dark;
 	};
@@ -552,7 +552,7 @@ namespace foo_skipcount {
 			MSG_WM_CLOSE(OnClose)
 		END_MSG_MAP()
 	private:
-		CToolTipCtrl tooltips[7];
+		CToolTipCtrl tooltips[8];
 		// Dark mode hooks object, must be a member of dialog class.
 		fb2k::CDarkModeHooks m_dark;
 	};

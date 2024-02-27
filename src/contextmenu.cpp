@@ -4,7 +4,7 @@
 #include <helpers/tag_write_callback_impl.h>
 #include <SDK/messageBox.h>
 
-#include "tinyxml2.h"
+#include "include/tinyxml2.h"
 
 #include "preferences.h"
 #include "record.h"
