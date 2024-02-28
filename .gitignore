@@ -7,14 +7,12 @@ foobar2000 (x86)/
 !foobar2000 (x86)/profile/user-components/foo_skipcount/
 foobar2000 V1.6/
 !foobar2000 V1.6\doc/
-!foobar2000 V1.6/components/foo_skipcount.dll
 foobar2000-SDK/
 !foobar2000-SDK/\foobar2000\foobar2000_component_client/foobar2000_component_client.vcxproj
 !foobar2000-SDK\foobar2000\helpers/foobar2000_sdk_helpers.vcxproj
 !foobar2000-SDK\foobar2000\SDK\foobar2000_SDK.vcxproj
 !foobar2000-SDK\libPPUI/libPPUI.vcxproj
 !foobar2000-SDK\pfc/pfc.vcxproj
-!foobar2000-SDK\WTL
 !pdbs/
 src/.vs/
 src/packages/

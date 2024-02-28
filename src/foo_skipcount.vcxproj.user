@@ -6,7 +6,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommand>C:\Users\Rob\Documents\foo_skipcount\foobar2000 (x86)\foobar2000.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>C:\Users\Rob\Documents\foo_skipcount\foobar2000 V1.6\foobar2000.exe</LocalDebuggerCommand>
     <LocalDebuggerAttach>false</LocalDebuggerAttach>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
