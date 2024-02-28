@@ -815,7 +815,7 @@ namespace foo_skipcount {
 				if(xmlOldest) {
 					t_filetimestamp oldestTimestamp = getOldestSkip(record);
 					entry->SetAttribute("OldestSkip", oldestTimestamp != 0 ? foobar2000_io::format_filetimestamp(oldestTimestamp) : "Never");
-					entry->SetAttribute("OldestkipTimestamp", oldestTimestamp != 0 ? std::to_string(getLocalTimestamp(oldestTimestamp, xmlJS)).c_str() : "Never");
+					entry->SetAttribute("OldestSkipTimestamp", oldestTimestamp != 0 ? std::to_string(getLocalTimestamp(oldestTimestamp, xmlJS)).c_str() : "Never");
 				}
 				if(xmlTimestampCount) {
 					entry->SetAttribute("TimestampCount", record.skipTimes.size());
