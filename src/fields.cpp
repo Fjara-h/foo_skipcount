@@ -48,7 +48,7 @@ namespace foo_skipcount {
 
 		switch(index) {
 			case FIELD_SKIP_COUNT: {
-				out->write(titleformat_inputtypes::meta, std::to_string(record.skipCountNext + record.skipCountRandom + record.skipCountPrevious).c_str());
+				out->write(titleformat_inputtypes::meta, std::to_string(record.skipCountNext + record.skipCountRandom + record.skipCountPrevious + record.skipCountDoubleClick).c_str());
 				break;
 			}
 			case FIELD_LAST_SKIP:

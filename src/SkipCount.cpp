@@ -153,14 +153,15 @@ namespace foo_skipcount {
 			if(!currentTrack.is_empty()) {
 				previousTrack = currentTrack;
 			}
-			if(!previousTrack.is_empty() && lastSkipCommand > 0 && shouldCountSkip) {
+
+			if(!previousTrack.is_empty() && lastSkipCommand > 0 && !skipProtected && !hasPassedCondition) {
 				on_item_skipped(previousTrack, lastSkipCommand);
 			}
 			currentTrack = metadb;
 			currentTrackTotalDuration = metadb->get_length();
 
-			// Skip condition can be met immediately unless there is protection, dealt with later
-			shouldCountSkip = true;
+			skipProtected = true;
+			hasPassedCondition = false;
 			if(cfg_skipProtectionNext && lastSkipCommand == playback_control::track_command_next) {
 				protectionOffsetTime = cfg_skipProtectionNextTime;
 			}
@@ -174,6 +175,7 @@ namespace foo_skipcount {
 				protectionOffsetTime = cfg_skipProtectionDoubleClickTime;
 			}
 			else {
+				skipProtected = false;
 				protectionOffsetTime = 0;
 			}
 		}
@@ -218,18 +220,25 @@ namespace foo_skipcount {
 		void on_playback_dynamic_info_track(const file_info&) {};
 
 		void my_play_callback::on_playback_time(double p_time) {
-			if(p_time >= protectionOffsetTime) {
-				// Time and/or percent required is shifted by adding protection time
-				//  If skips should count after 5 seconds, and skip protection is 1 second, count after 6
-				p_time += protectionOffsetTime;
-
-				// While skips can be logged, check for one of the conditions to switch it off
-				if(shouldCountSkip && (
-					(cfg_condition == LOGCONDITION_TIME && p_time >= double(cfg_time)) ||
-					(cfg_condition == LOGCONDITION_PERCENT && (p_time / currentTrackTotalDuration) >= double(cfg_percent / 100)) ||
-					(cfg_condition == LOGCONDITION_TIMEANDPERCENT && (p_time / currentTrackTotalDuration) >= double(cfg_percent / 100) && p_time >= double(cfg_time)))) {
-					shouldCountSkip = false;
+			if(skipProtected) {
+				if(p_time < protectionOffsetTime) {
+					return;
 				}
+				else {
+					skipProtected = false;
+				}
+			}
+
+			// Time and/or percent required is shifted by adding protection time
+			//  If skips should count after 5 seconds, and skip protection is 1 second, count after 6
+			p_time += protectionOffsetTime;
+
+			// While skips can be logged, check for one of the conditions to switch it off
+			if(!hasPassedCondition && (
+				(cfg_condition == LOGCONDITION_TIME && p_time >= double(cfg_time)) ||
+				(cfg_condition == LOGCONDITION_PERCENT && (p_time / currentTrackTotalDuration) >= double(cfg_percent / 100)) ||
+				(cfg_condition == LOGCONDITION_TIMEANDPERCENT && (p_time / currentTrackTotalDuration) >= double(cfg_percent / 100) && p_time >= double(cfg_time)))) {
+				hasPassedCondition = true;
 			}
 		}
 
@@ -241,7 +250,7 @@ namespace foo_skipcount {
 		}
 	private:
 		metadb_handle_ptr currentTrack, previousTrack;
-		bool shouldCountSkip = false;
+		bool skipProtected = false, hasPassedCondition = false;
 		t_uint lastSkipCommand = 0, protectionOffsetTime = 0;
 		double currentTrackTotalDuration = 0;
 	};
