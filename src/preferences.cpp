@@ -156,7 +156,6 @@ namespace foo_skipcount {
 		cfg_skipProtectionDoubleClick = uButton_GetCheck(m_hWnd, IDC_PROTECTION_DOUBLECLICK);
 		cfg_skipProtectionDoubleClickTime = GetIntConformedToBounds(m_hWnd, IDC_PROTECTION_DOUBLECLICK_TIME);
 
-		theAPI()->dispatch_global_refresh();
 		OnChanged(); // Dialog content has not changed but the flags have - shown values now match the settings so the apply button can be disabled
 	}
 
@@ -387,7 +386,6 @@ namespace foo_skipcount {
 		cfg_tagAllTimestampsRaw = uButton_GetCheck(m_hWnd, IDC_TAG_ALL_TIMESTAMPS_RAW);
 		cfg_tagTimestampDelimiter = (t_int32)uSendDlgItemMessage(IDC_TAG_TIMESTAMP_DELIMITER, CB_GETCURSEL);
 
-		theAPI()->dispatch_global_refresh();
 		OnChanged(); // Dialog content has not changed but the flags have - shown values now match the settings so the apply button can be disabled
 	}
 
