@@ -4,7 +4,7 @@
 #include "stdafx.h"
 
 #define COMPONENT_NAME			"foo_skipcount"
-#define COMPONENT_VERSION		"2.0.3"
+#define COMPONENT_VERSION		"2.0.4"
 #define CURRENT_RECORD_VERSION  3
 
 // {592AAD05-29DB-4522-ACA2-AE44CE7B0BC4}

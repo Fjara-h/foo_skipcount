@@ -71,7 +71,7 @@ namespace foo_skipcount {
 					out->write(titleformat_inputtypes::meta, "[]");
 				}
 				else {
-					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), (index == FIELD_SKIP_TIMES)).c_str());
+					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), (index == FIELD_SKIP_TIMES), ", ", (index == FIELD_SKIP_TIMES_JS)).c_str());
 				}
 				break;
 			}
