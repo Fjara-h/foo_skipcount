@@ -28,11 +28,21 @@ namespace foo_skipcount {
 	}
 
 	inline static t_filetimestamp getLatestSkip(record_t record) {
-		return (record.version > 1 && !record.skipTimes.empty()) ? record.skipTimes.back() : 0;
+		if((record.version > 1 && !record.skipTimes.empty())) {
+			return (record.skipTimes.size() == 1) ? record.skipTimes[0] : record.skipTimes.back();
+		}
+		else {
+			return 0;
+		}
 	}
 
 	inline static t_filetimestamp getOldestSkip(record_t record) {
-		return (record.version > 1 && !record.skipTimes.empty()) ? record.skipTimes.front() : 0;
+		if((record.version > 1 && !record.skipTimes.empty())) {
+			return (record.skipTimes.size() == 1) ? record.skipTimes[0] : record.skipTimes.front();
+		}
+		else {
+			return 0;
+		}
 	}
 
 	static std::string getSkipTimesStr(std::vector<t_filetimestamp> skipTimes, bool JS, bool dateTime, std::string delimiter = ", ", bool useArrayChars = false) {
