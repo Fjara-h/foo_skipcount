@@ -55,11 +55,11 @@ namespace foo_skipcount {
 			case FIELD_LATEST_SKIP:
 			case FIELD_FIRST_SKIP:
 			case FIELD_OLDEST_SKIP: {
-				if(record.skipTimes.size() == 0) {
+				t_filetimestamp skip = (index == FIELD_LAST_SKIP || index == FIELD_LATEST_SKIP) ? getLatestSkip(record) : getOldestSkip(record);
+				if(skip == 0) {
 					out->write(titleformat_inputtypes::meta, "Never");
 				}
 				else {
-					t_filetimestamp skip = (index == FIELD_LAST_SKIP || index == FIELD_LATEST_SKIP) ? record.skipTimes.back() : record.skipTimes.front();
 					out->write(titleformat_inputtypes::meta, foobar2000_io::format_filetimestamp(skip));
 				}
 				break;
@@ -71,7 +71,7 @@ namespace foo_skipcount {
 					out->write(titleformat_inputtypes::meta, "[]");
 				}
 				else {
-					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), (index == FIELD_SKIP_TIMES)).c_str());
+					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), (index == FIELD_SKIP_TIMES), ", ", (index == FIELD_SKIP_TIMES_JS)).c_str());
 				}
 				break;
 			}
@@ -121,18 +121,18 @@ namespace foo_skipcount {
 		}
 
 		if(hashes.get_count() == 1 && !firstRecord.skipTimes.empty()) {
-			skipTimesStr = getSkipTimesStr(firstRecord.skipTimes, false, true).c_str();
+			skipTimesStr = getSkipTimesStr(firstRecord.skipTimes, false, true, ", ", true).c_str();
 #define MAX_PROPERTY_LENGTH 500
 			if(skipTimesStr.get_length() > MAX_PROPERTY_LENGTH) {
 				skipTimesStr.truncate(MAX_PROPERTY_LENGTH);
 				skipTimesStr += "...";
 			}
-			skipTimesRawStr = getSkipTimesStr(firstRecord.skipTimes, false, false).c_str();
+			skipTimesRawStr = getSkipTimesStr(firstRecord.skipTimes, false, false, ", ", true).c_str();
 			if(skipTimesRawStr.get_length() > MAX_PROPERTY_LENGTH) {
 				skipTimesRawStr.truncate(MAX_PROPERTY_LENGTH);
 				skipTimesRawStr += "...";
 			}
-			skipTimesJSStr = getSkipTimesStr(firstRecord.skipTimes, true, false).c_str();
+			skipTimesJSStr = getSkipTimesStr(firstRecord.skipTimes, true, false, ", ", true).c_str();
 			if(skipTimesJSStr.get_length() > MAX_PROPERTY_LENGTH) {
 				skipTimesJSStr.truncate(MAX_PROPERTY_LENGTH);
 				skipTimesJSStr += "...";

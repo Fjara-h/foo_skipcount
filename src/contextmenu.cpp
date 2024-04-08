@@ -528,7 +528,7 @@ namespace foo_skipcount {
 							}
 						}
 						if(writeMsg) {
-							pfc::stringLite skipTimes = getSkipTimesStr(recordWrite.skipTimes, false, true, false).c_str();
+							pfc::stringLite skipTimes = getSkipTimesStr(recordWrite.skipTimes, false, true, ", ", false).c_str();
 							if(skipTimes.get_length() > MAX_DISPLAY_LENGTH) {
 								skipTimes.truncate(MAX_DISPLAY_LENGTH);
 								skipTimes += "...";
@@ -655,7 +655,7 @@ namespace foo_skipcount {
 					info[i].meta_set(tagMetaFieldString.at("current").c_str(), std::to_string(getLocalTimestamp(filetimestamp_from_system_timer(), false)).c_str());
 				}
 				if(tagAllTimestampsRaw) {
-					info[i].meta_set(tagMetaFieldString.at("times").c_str(), getSkipTimesStr(record.skipTimes, false, false, false, tagTimestampDelimiters[tagDelimiter]).c_str());
+					info[i].meta_set(tagMetaFieldString.at("times").c_str(), getSkipTimesStr(record.skipTimes, false, false, tagTimestampDelimiters[tagDelimiter], false).c_str());
 				}
 				tmp += hash;
 			}
