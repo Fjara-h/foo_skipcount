@@ -28,33 +28,23 @@ namespace foo_skipcount {
 	}
 
 	inline static t_filetimestamp getLatestSkip(record_t record) {
-		if((record.version > 1 && !record.skipTimes.empty())) {
-			return (record.skipTimes.size() == 1) ? record.skipTimes[0] : record.skipTimes.back();
-		}
-		else {
-			return 0;
-		}
+		return record.skipTimes.empty() ? 0 : record.skipTimes.back();
 	}
 
 	inline static t_filetimestamp getOldestSkip(record_t record) {
-		if((record.version > 1 && !record.skipTimes.empty())) {
-			return (record.skipTimes.size() == 1) ? record.skipTimes[0] : record.skipTimes.front();
-		}
-		else {
-			return 0;
-		}
+		return record.skipTimes.empty() ? 0 : record.skipTimes.front();
 	}
 
-	static std::string getSkipTimesStr(std::vector<t_filetimestamp> skipTimes, bool JS, bool dateTime, std::string delimiter = ", ", bool useArrayChars = false) {
+	static std::string getSkipTimesStr(std::vector<t_filetimestamp> skipTimes, bool JS, bool dateTime, bool useArrayChars = true, std::string delimiter = ", ") {
 		if(skipTimes.empty()) {
 			return useArrayChars ? "[]" : "";
 		}
 		std::string str = useArrayChars ? "[" : "";
 		for(t_filetimestamp& time : skipTimes) {
 			if(dateTime) {
-				str.append(useArrayChars ? "" : "\"");
+				str.append(useArrayChars ? "\"" : "");
 				str.append(foobar2000_io::format_filetimestamp(time));
-				str.append(useArrayChars ? "" : "\"");
+				str.append(useArrayChars ? "\"" : "");
 			}
 			else {
 				str.append(std::to_string(getLocalTimestamp(time, JS)));

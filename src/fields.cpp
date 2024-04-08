@@ -71,7 +71,7 @@ namespace foo_skipcount {
 					out->write(titleformat_inputtypes::meta, "[]");
 				}
 				else {
-					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), (index == FIELD_SKIP_TIMES), ", ", (index == FIELD_SKIP_TIMES_JS)).c_str());
+					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), (index == FIELD_SKIP_TIMES)).c_str());
 				}
 				break;
 			}
@@ -96,7 +96,7 @@ namespace foo_skipcount {
 
 		t_uint skipCount = 0, nextCount = 0, randomCount = 0, previousCount = 0, doubleClickCount = 0;
 		pfc::stringLite skipTimesStr = "", skipTimesRawStr = "", skipTimesJSStr = "", latestSkipStr = "", oldestSkipStr = "";
-		t_filetimestamp latestSkip = filetimestamp_invalid, oldestSkip = UINTPTR_MAX;
+		t_filetimestamp latestSkip = filetimestamp_invalid, oldestSkip = filetimestamp_invalid;
 
 		record_t firstRecord;
 		for(metadb_index_hash hash : hashes) {
@@ -111,35 +111,35 @@ namespace foo_skipcount {
 			previousCount += record.skipCountPrevious;
 			doubleClickCount += record.skipCountDoubleClick;
 			if(!record.skipTimes.empty()) {
-				if(oldestSkip > record.skipTimes.front()) {
+				if(oldestSkip > record.skipTimes.front() || oldestSkip == filetimestamp_invalid) {
 					oldestSkip = record.skipTimes.front();
 				}
-				if(latestSkip < record.skipTimes.back()) {
+				if(latestSkip < record.skipTimes.back() || latestSkip == filetimestamp_invalid) {
 					latestSkip = record.skipTimes.back();
 				}
 			}
 		}
 
 		if(hashes.get_count() == 1 && !firstRecord.skipTimes.empty()) {
-			skipTimesStr = getSkipTimesStr(firstRecord.skipTimes, false, true, ", ", true).c_str();
+			skipTimesStr = getSkipTimesStr(firstRecord.skipTimes, false, true).c_str();
 #define MAX_PROPERTY_LENGTH 500
 			if(skipTimesStr.get_length() > MAX_PROPERTY_LENGTH) {
 				skipTimesStr.truncate(MAX_PROPERTY_LENGTH);
 				skipTimesStr += "...";
 			}
-			skipTimesRawStr = getSkipTimesStr(firstRecord.skipTimes, false, false, ", ", true).c_str();
+			skipTimesRawStr = getSkipTimesStr(firstRecord.skipTimes, false, false).c_str();
 			if(skipTimesRawStr.get_length() > MAX_PROPERTY_LENGTH) {
 				skipTimesRawStr.truncate(MAX_PROPERTY_LENGTH);
 				skipTimesRawStr += "...";
 			}
-			skipTimesJSStr = getSkipTimesStr(firstRecord.skipTimes, true, false, ", ", true).c_str();
+			skipTimesJSStr = getSkipTimesStr(firstRecord.skipTimes, true, false).c_str();
 			if(skipTimesJSStr.get_length() > MAX_PROPERTY_LENGTH) {
 				skipTimesJSStr.truncate(MAX_PROPERTY_LENGTH);
 				skipTimesJSStr += "...";
 			}
 		}
 
-		oldestSkipStr = (oldestSkip == UINTPTR_MAX) ? "Never" : foobar2000_io::format_filetimestamp(oldestSkip);
+		oldestSkipStr = (oldestSkip == filetimestamp_invalid) ? "Never" : foobar2000_io::format_filetimestamp(oldestSkip);
 		latestSkipStr = (latestSkip == filetimestamp_invalid) ? "Never" : foobar2000_io::format_filetimestamp(latestSkip);
 
 		p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skip count", PFC_string_formatter() << skipCount << " times");
