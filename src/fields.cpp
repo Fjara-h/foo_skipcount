@@ -57,7 +57,7 @@ namespace foo_skipcount {
 			case FIELD_OLDEST_SKIP: {
 				t_filetimestamp skip = (index == FIELD_LAST_SKIP || index == FIELD_LATEST_SKIP) ? getLatestSkip(record) : getOldestSkip(record);
 				if(skip == 0) {
-					out->write(titleformat_inputtypes::meta, "Never");
+					out->write(titleformat_inputtypes::meta, "?");
 				}
 				else {
 					out->write(titleformat_inputtypes::meta, foobar2000_io::format_filetimestamp(skip));
@@ -139,8 +139,8 @@ namespace foo_skipcount {
 			}
 		}
 
-		oldestSkipStr = (oldestSkip == filetimestamp_invalid) ? "Never" : foobar2000_io::format_filetimestamp(oldestSkip);
-		latestSkipStr = (latestSkip == filetimestamp_invalid) ? "Never" : foobar2000_io::format_filetimestamp(latestSkip);
+		oldestSkipStr = (oldestSkip == filetimestamp_invalid) ? "?" : foobar2000_io::format_filetimestamp(oldestSkip);
+		latestSkipStr = (latestSkip == filetimestamp_invalid) ? "?" : foobar2000_io::format_filetimestamp(latestSkip);
 
 		p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skip count", PFC_string_formatter() << skipCount << " times");
 		p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Next skipped", PFC_string_formatter() << nextCount << " times");
