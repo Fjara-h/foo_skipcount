@@ -809,13 +809,17 @@ namespace foo_skipcount {
 				}
 				if(xmlLatest) {
 					t_filetimestamp latestTimestamp = getLatestSkip(record);
-					entry->SetAttribute("LatestSkip", latestTimestamp != 0 ? foobar2000_io::format_filetimestamp(latestTimestamp) : "?");
-					entry->SetAttribute("LatestSkipTimestamp", latestTimestamp != 0 ? std::to_string(getLocalTimestamp(latestTimestamp, xmlJS)).c_str() : "?");
+					if(latestTimestamp != 0) {
+						entry->SetAttribute("LatestSkip", foobar2000_io::format_filetimestamp(latestTimestamp));
+						entry->SetAttribute("LatestSkipTimestamp", std::to_string(getLocalTimestamp(latestTimestamp, xmlJS)).c_str());
+					}
 				}
 				if(xmlOldest) {
 					t_filetimestamp oldestTimestamp = getOldestSkip(record);
-					entry->SetAttribute("OldestSkip", oldestTimestamp != 0 ? foobar2000_io::format_filetimestamp(oldestTimestamp) : "?");
-					entry->SetAttribute("OldestSkipTimestamp", oldestTimestamp != 0 ? std::to_string(getLocalTimestamp(oldestTimestamp, xmlJS)).c_str() : "?");
+					if(oldestTimestamp != 0) {
+						entry->SetAttribute("OldestSkip", foobar2000_io::format_filetimestamp(oldestTimestamp));
+						entry->SetAttribute("OldestSkipTimestamp", std::to_string(getLocalTimestamp(oldestTimestamp, xmlJS)).c_str());
+					}
 				}
 				if(xmlTimestampCount) {
 					entry->SetAttribute("TimestampCount", record.skipTimes.size());

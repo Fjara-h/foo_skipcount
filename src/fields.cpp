@@ -49,7 +49,7 @@ namespace foo_skipcount {
 		switch(index) {
 			case FIELD_SKIP_COUNT: {
 				out->write(titleformat_inputtypes::meta, std::to_string(record.skipCountNext + record.skipCountRandom + record.skipCountPrevious + record.skipCountDoubleClick).c_str());
-				break;
+				return true;
 			}
 			case FIELD_LAST_SKIP:
 			case FIELD_LATEST_SKIP:
@@ -57,23 +57,23 @@ namespace foo_skipcount {
 			case FIELD_OLDEST_SKIP: {
 				t_filetimestamp skip = (index == FIELD_LAST_SKIP || index == FIELD_LATEST_SKIP) ? getLatestSkip(record) : getOldestSkip(record);
 				if(skip == 0) {
-					out->write(titleformat_inputtypes::meta, "?");
+					return false;
 				}
 				else {
 					out->write(titleformat_inputtypes::meta, foobar2000_io::format_filetimestamp(skip));
+					return true;
 				}
-				break;
 			}
 			case FIELD_SKIP_TIMES:
 			case FIELD_SKIP_TIMES_JS: 
 			case FIELD_SKIP_TIMES_RAW: {
 				if(record.skipTimes.empty()) {
-					out->write(titleformat_inputtypes::meta, "[]");
+					return false;
 				}
 				else {
 					out->write(titleformat_inputtypes::meta, getSkipTimesStr(record.skipTimes, (index == FIELD_SKIP_TIMES_JS), (index == FIELD_SKIP_TIMES)).c_str());
+					return true;
 				}
-				break;
 			}
 		}
 		return true;
@@ -139,8 +139,8 @@ namespace foo_skipcount {
 			}
 		}
 
-		oldestSkipStr = (oldestSkip == filetimestamp_invalid) ? "?" : foobar2000_io::format_filetimestamp(oldestSkip);
-		latestSkipStr = (latestSkip == filetimestamp_invalid) ? "?" : foobar2000_io::format_filetimestamp(latestSkip);
+		oldestSkipStr = (oldestSkip == filetimestamp_invalid) ? "" : foobar2000_io::format_filetimestamp(oldestSkip);
+		latestSkipStr = (latestSkip == filetimestamp_invalid) ? "" : foobar2000_io::format_filetimestamp(latestSkip);
 
 		p_out.set_property(strPropertiesGroup, priorityBase + 1, PFC_string_formatter() << "Skip count", PFC_string_formatter() << skipCount << " times");
 		p_out.set_property(strPropertiesGroup, priorityBase + 2, PFC_string_formatter() << "Next skipped", PFC_string_formatter() << nextCount << " times");
